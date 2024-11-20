@@ -192,10 +192,11 @@ REST_FRAMEWORK = {
 
 # Celery Settings
 # railway
-CELERY_BROKER_URL = 'redis://default:H4LI35FaK3Iap6pNIbkf51K2PLMHjFKk@roundhouse.proxy.rlwy.net:18044'
+# comment out for now
+# CELERY_BROKER_URL = 'redis://default:H4LI35FaK3Iap6pNIbkf51K2PLMHjFKk@roundhouse.proxy.rlwy.net:18044'
 
-CELERY_ACCEPT_CONTENT= ['application/json']
-CELERY_RESULT_SERIALIZER='json'
-CELERY_TASK_SERIALIZER ='json'
-CELERY_TIMEZONE='UTC'
-CELERY_RESULT_BACKEND = 'django-db'
+# CELERY_ACCEPT_CONTENT= ['application/json']
+# CELERY_RESULT_SERIALIZER='json'
+# CELERY_TASK_SERIALIZER ='json'
+# CELERY_TIMEZONE='UTC'
+# CELERY_RESULT_BACKEND = 'django-db'
