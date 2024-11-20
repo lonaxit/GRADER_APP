@@ -27,22 +27,22 @@ environ.Env.read_env()
 
 # SECURITY WARNING: keep the secret key used in production secret!
 # local
-# SECRET_KEY = 'django-insecure-dfg=5b@%p+n0l23l2k2@k61j)bbwlw0gtl4$r!pt2q)(#z39@m'
+SECRET_KEY = 'django-insecure-dfg=5b@%p+n0l23l2k2@k61j)bbwlw0gtl4$r!pt2q)(#z39@m'
 
 # production
-SECRET_KEY = env('SECRET_KEY')
+# SECRET_KEY = env('SECRET_KEY')
 
 # SECURITY WARNING: don't run with debug turned on in production!
 # local
-# DEBUG = True
+DEBUG = True
 
 # for production
-DEBUG = env('DEBUG')
+# DEBUG = env('DEBUG')
 
 # production
-ALLOWED_HOSTS = ['graderapi-production.up.railway.app']
+# ALLOWED_HOSTS = ['graderapi-production.up.railway.app']
 # dev
-# ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -72,15 +72,16 @@ CORS_ORIGIN_ALLOW_ALL = True
 
 CORS_ALLOW_ALL_ORIGINS: False
 
-CORS_ALLOWED_ORIGINS = [
-    # "http://localhost:8080"
-    "https://www.skygiftedacademymkar.net",
-  
-]
-
+# was present from production
 # CORS_ALLOWED_ORIGINS = [
-#     "http://localhost:8080",
+#     # "http://localhost:8080"
+#     "https://www.skygiftedacademymkar.net",
+  
 # ]
+
+CORS_ALLOWED_ORIGINS = [
+    "http://localhost:8080",
+]
 
 MIDDLEWARE = [
     'django.middleware.security.SecurityMiddleware',
@@ -119,19 +120,19 @@ WSGI_APPLICATION = 'gradebook.wsgi.application'
 
 
 # local
-# DATABASES = {
-#     'default': {
-#         'ENGINE': 'django.db.backends.postgresql',
-#         'NAME':'grader_api_db',
-#         'USER': 'postgres',
-#         'PASSWORD':'2021_lonax',
-#     }
-# }
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME':'grader_api_db',
+        'USER': 'postgres',
+        'PASSWORD':'79_luper',
+    }
+}
 
 # production
-DATABASES={
-    'default': dj_database_url.parse(env('DATABASE_URL'))
-}
+# DATABASES={
+#     'default': dj_database_url.parse(env('DATABASE_URL'))
+# }
 
 
 # Password validation
