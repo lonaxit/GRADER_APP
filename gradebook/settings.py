@@ -132,6 +132,7 @@ WSGI_APPLICATION = 'gradebook.wsgi.application'
 # }
 
 # production
+# Databse conection made the deployment fail
 DATABASES={
     'default': dj_database_url.parse(env('DATABASE_URL'))
 }
