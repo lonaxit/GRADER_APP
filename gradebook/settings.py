@@ -131,12 +131,23 @@ WSGI_APPLICATION = 'gradebook.wsgi.application'
 #     }
 # }
 
+DATABASES = {
+    'default': {
+        'ENGINE': 'django.db.backends.postgresql',
+        'NAME': 'railway',  # Replace with your database name
+        'USER': 'postgres',       # Replace with your username
+        'PASSWORD': 'HxAFhDctJakdbmDtPugeUhaKCLNoFYgm',   # Replace with your password
+        'HOST': 'postgres.railway.internal',           # Replace with your host
+        'PORT': '5432',           # Replace with your port (default is 5432)
+    }
+}
+
 # production
 # Databse conection made the deployment fail
 # fgdgdgdhdhhhdhhdhhfghhhfhhhfh
-DATABASES={
-    'default': dj_database_url.parse(env('DATABASE_URL'))
-}
+# DATABASES={
+#     'default': dj_database_url.parse(env('DATABASE_URL'))
+# }
 
 
 # Password validation
