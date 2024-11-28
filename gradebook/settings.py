@@ -40,9 +40,10 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 
 # production
-# ALLOWED_HOSTS = ['graderapi-production.up.railway.app']
+ALLOWED_HOSTS = ['skygiftedacademy.up.railway.app']
+
 # dev
-ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -130,22 +131,23 @@ WSGI_APPLICATION = 'gradebook.wsgi.application'
 #         'PASSWORD':'79_luper',
 #     }
 # }
+
 # Prod
-DATABASES = {
-    'default': {
-        'ENGINE': 'django.db.backends.postgresql',
-        'NAME': env('DB_NAME'),  
-        'USER': env('DB_USER'),  
-        'PASSWORD': env('DB_PASSWORD'),
-        'HOST': env('DB_HOST'),        
-        'PORT': env('DB_PORT'),        
-    }
-}
+# DATABASES = {
+#     'default': {
+#         'ENGINE': 'django.db.backends.postgresql',
+#         'NAME': env('DB_NAME'),  # Replace with your database name env('DATABASE_URL')
+#         'USER': env('DB_USER'),       # Replace with your username
+#         'PASSWORD': env('DB_PASSWORD'),   # Replace with your password
+#         'HOST': env('DB_HOST'),           # Replace with your host
+#         'PORT': env('DB_PORT'),           # Replace with your port (default is 5432)
+#     }
+# }
 
 # production
-# DATABASES={
-#     'default': dj_database_url.parse(env('DATABASE_URL'))
-# }
+DATABASES={
+    'default': dj_database_url.parse(env('DATABASE_PUBLIC_URL'))
+}
 
 
 # Password validation
