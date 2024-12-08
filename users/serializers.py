@@ -47,6 +47,12 @@ class StudentProfileSerializer(serializers.ModelSerializer): #child model
     def get_studentid(self,object):
         return object.user.pk
    
+class EnrollBySearchSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = StudentProfile
+        fields = "__all__"
+    
 # user app
 class UserSerializer(serializers.ModelSerializer):
     studentprofile = StudentProfileSerializer(read_only=True) #parent model

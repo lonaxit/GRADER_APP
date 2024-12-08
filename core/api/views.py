@@ -1463,6 +1463,142 @@ class FirstAdmNumberView(APIView):
         return Response(serializer.data) 
 
 
+#Search user by name
+
+class SearchEnroll(generics.ListAPIView):
+    serializer_class = UserSerializer
+    # permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+
+    def get_queryset(self):
+        name = self.request.query_params.get('name')
+
+        if not name:
+            raise ValidationError("The 'name' parameter is required.")
+
+        queryset = User.objects.filter(sur_name=name)
+
+        if not queryset.exists():
+            raise ValidationError("No records matching your criteria.")
+
+        return queryset
+    
+#Enroll by search 
+class EnrollBySearch(generics.CreateAPIView):
+    serializer_class = EnrollBySearchSerializer
+    # permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+    # def get_queryset(self):
+        # just return the review object
+        # return Classroom.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        
+        user_id = request.data.get('user_id')
+        class_id = request.data.get('class_id')
+        # used only when the endpoint has parameters as part of it
+        # user_id = self.request.query_params.get('user_id')
+
+        
+        with transaction.atomic():
+            
+            try:
+                activeTerm = Term.objects.get(status='True')
+                activeSession = Session.objects.get(status='True')
+                
+                userObj = User.objects.get(pk=user_id)
+                
+                classObj = SchoolClass.objects.get(pk=class_id)
+                
+                # get admission number
+                adm_number = AdmissionNumber.objects.filter(status='No').first()
+                string_number = str(adm_number.serial_no)
+                admissionstring = 'SKY/STDM/'+activeSession.name+'/'+string_number
+                
+                # check if student is already enrolled
+                studentEnrolled = Classroom.objects.filter(Q(term=activeTerm.pk) & Q(session=activeSession.pk) & Q (class_room=classObj.pk) & Q(student=userObj.pk))
+                
+                if studentEnrolled:
+                    raise ValidationError("You are already enrolled")
+                
+                # Create StudentProfile
+                myProfile = StudentProfile.objects.create(
+                    guardian = userObj.sur_name,
+                    user_id= userObj.pk,
+                    class_admitted_id =classObj.pk,
+                    session_admitted_id=activeSession.pk,
+                    term_admitted_id=activeTerm.pk,
+                    admission_number =adm_number.serial_no,
+                    admission_numberstring = admissionstring
+                )
+                myProfile.save()
+                
+                enrollObj = Classroom.objects.create(
+                        class_room=classObj,
+                        session_id = activeSession.pk,
+                        term_id = activeTerm.pk,
+                        student_id = userObj.pk
+                        )
+                enrollObj.save()
+                
+                adm_number.status='Yes'
+                adm_number.save()
+                
+  
+            except Exception as e:
+                raise ValidationError(e)
+           
+        return Response(
+                {'msg':'Enrollment created successfully'},
+                status = status.HTTP_201_CREATED
+                )
+        
+        
+    
+  
+class FetchNewEnrollment(generics.ListAPIView):
+    serializer_class = ClassroomSerializer
+    # permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+
+    def get_queryset(self):
+        class_id = self.request.query_params.get('class_id')
+        activeTerm = Term.objects.get(status='True')
+        activeSession = Session.objects.get(status='True')
+        classObj = SchoolClass.objects.get(pk=class_id)
+
+        if not class_id:
+            raise ValidationError("The 'class id' parameter is required.")
+
+        queryset = Classroom.objects.filter(Q(term=activeTerm.pk) & Q(session=activeSession.pk) & Q (class_room=classObj.pk))
+
+        if not queryset.exists():
+            raise ValidationError("No records matching your criteria.")
+
+        return queryset
+  
+# class SearchEnroll(generics.ListAPIView):
+#     serializer_class = UserSerializer
+#     # permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
+    
+#     def get_queryset(self):
+#         # _class = self.request.data.get('classroom')
+#         # _session = self.request.data.get('session')
+#         # _term = self.request.data.get('term')
+#         payload = self.request.query_params
+        
+#         name = payload.get('name')
+        
+#         # classObj = SchoolClass.objects.get(pk=myclass)
+#         # termObj = Term.objects.get(pk=payload.get('term'))
+#         # sessionObj = Session.objects.get(pk=payload.get('session'))
+        
+#         # Example: Fetching data based on a filter field named 'filter_field'
+#         queryset = User.objects.filter(sur_name=name)
+        
+#         if not queryset:
+#             raise ValidationError("No records matching your criteria")
+#         return queryset
+
+
 
 
 
