@@ -1463,8 +1463,7 @@ class FirstAdmNumberView(APIView):
         return Response(serializer.data) 
 
 
-#Search user by name
-
+#Search student user by name
 class SearchEnroll(generics.ListAPIView):
     serializer_class = UserSerializer
     # permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
@@ -1496,6 +1495,7 @@ class EnrollBySearch(generics.CreateAPIView):
         
         user_id = request.data.get('user_id')
         class_id = request.data.get('class_id')
+        
         # used only when the endpoint has parameters as part of it
         # user_id = self.request.query_params.get('user_id')
 
