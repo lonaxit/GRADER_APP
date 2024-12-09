@@ -1475,7 +1475,8 @@ class SearchEnroll(generics.ListAPIView):
         if not name:
             raise ValidationError("The 'name' parameter is required.")
 
-        queryset = User.objects.filter(sur_name=name)
+        
+        queryset = User.objects.filter(sur_name__icontains=name)
 
         if not queryset.exists():
             raise ValidationError("No records matching your criteria.")
