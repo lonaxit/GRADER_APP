@@ -18,7 +18,7 @@ def fun(self):
     # operations
     print("You are in Fun function")
     return "done"
-
+# check whether we are using this
 @shared_task
 def mul(x, y):
     print( x * y)   
