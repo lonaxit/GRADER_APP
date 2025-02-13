@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ["python3.8", "postgresql-16", "gcc"]
+nixPkgs = ["python3.8"]
 
 [phases.install]
 commands = [
