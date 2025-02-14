@@ -1,5 +1,5 @@
 [phases.setup]
-nixPkgs = ['...','python38','gcc', 'python38Packages.pip']
+nixPkgs = ['...','python38', 'python38Packages.pip']
 
 [phases.build]
 cmds = [
