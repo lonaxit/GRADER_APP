@@ -1,12 +1,16 @@
 [phases.setup]
-nixPkgs = ["python38"]
+nixPkgs = [
+    "python38",
+    "postgresql"
+]
 
 [phases.install]
 commands = [
- "pip install -r requirements.txt"
+    "pip install -r requirements.txt"
 ]
 
 [phases.start]
 commands = [
-    "python manage.py migrate && gunicorn gradebook.wsgi"
+    "python manage.py migrate",
+    "gunicorn gradebook.wsgi --bind 0.0.0.0:$PORT"
 ]
