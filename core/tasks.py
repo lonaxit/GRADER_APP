@@ -12,7 +12,7 @@ import datetime
 from core.api.utilities import *
 
 # from midas.celery import app
-
+# deploying with zero configuration
 @shared_task(bind=True)
 def fun(self):
     # operations
