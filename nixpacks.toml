@@ -1,15 +1,11 @@
 [phases.setup]
-nixPkgs = ["python3.8", "pip", "virtualenv"]
+nixPkgs = ['...','python38','gcc', 'python38Packages.pip']
 
-[phases.install]
-commands = [
-  "python -m venv /opt/venv",
-  "/opt/venv/bin/pip install --upgrade pip",
-  "/opt/venv/bin/pip install -r requirements.txt"
+[phases.build]
+cmds = [
+    "pip install --upgrade pip",
+    "pip install -r requirements.txt"
 ]
 
 [phases.start]
-commands = [
-  "/opt/venv/bin/python manage.py migrate",
-  "/opt/venv/bin/gunicorn gradebook.wsgi"
-]
+cmd = "gunicorn gradebook.wsgi --log-file -"
