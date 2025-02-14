@@ -1,12 +1,12 @@
+[phases.setup]
+nixPkgs = ["python38"]
+
 [phases.install]
 commands = [
-  "python -m venv /opt/venv",
-  "/opt/venv/bin/pip install --upgrade pip",
-  "/opt/venv/bin/pip install -r requirements.txt",
-  "/opt/venv/bin/python manage.py migrate"
+ pip install -r requirements.txt
 ]
 
 [phases.start]
 commands = [
-  "/opt/venv/bin/gunicorn --workers 3 --bind 0.0.0.0:$PORT gradebook.wsgi:application"
+    python manage.py migrate && gunicorn gradebook.wsgi
 ]
