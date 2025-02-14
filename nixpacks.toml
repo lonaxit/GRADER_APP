@@ -3,10 +3,10 @@ nixPkgs = ["python38"]
 
 [phases.install]
 commands = [
- pip install -r requirements.txt
+ "pip install -r requirements.txt"
 ]
 
 [phases.start]
 commands = [
-    python manage.py migrate && gunicorn gradebook.wsgi
+    "python manage.py migrate && gunicorn gradebook.wsgi"
 ]
