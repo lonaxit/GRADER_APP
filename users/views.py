@@ -149,22 +149,33 @@ class GetUserWithUsername(APIView):
             
 
 class retrieveAllUsers(APIView):
-    # permission_classes = [IsAuthenticated,IsAuthOrReadOnly]
-    
-    
-    def get(self,request):
+    # permission_classes = [IsAuthenticated, IsAuthOrReadOnly]
+
+    def get(self, request):
         try:
-            user = User.objects.all()
-            user = UserSerializer(user,many=True)
-            return Response(
-                {'user':user.data},
-                status= status.HTTP_200_OK
-            )
-        except:
-            return Response(
-                {'error':'Unable to retrieve data'},
-                status =status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            users = User.objects.all()
+            serializer = UserSerializer(users, many=True)
+            return Response({'user': serializer.data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+        
+# class retrieveAllUsers(APIView):
+#     # permission_classes = [IsAuthenticated,IsAuthOrReadOnly]
+    
+    
+#     def get(self,request):
+#         try:
+#             user = User.objects.all()
+#             user = UserSerializer(user,many=True)
+#             return Response(
+#                 {'user':user.data},
+#                 status= status.HTTP_200_OK
+#             )
+#         except:
+#             return Response(
+#                 {'error':'Unable to retrieve data'},
+#                 status =status.HTTP_500_INTERNAL_SERVER_ERROR
+#             )
 
 # fetch staff profile
 class retrieveAllStaff(APIView):
