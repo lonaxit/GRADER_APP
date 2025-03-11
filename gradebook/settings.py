@@ -28,10 +28,10 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 
 # production
-ALLOWED_HOSTS = ['https://skygiftedacademy.up.railway.app']
+# ALLOWED_HOSTS = ['skygiftedacademy.up.railway.app']
 
 # dev
-# ALLOWED_HOSTS = ['*']
+ALLOWED_HOSTS = ['*']
 
 
 # Application definition
