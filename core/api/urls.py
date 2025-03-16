@@ -131,7 +131,10 @@ urlpatterns =[
     # search and enroll student
     path("search-enroll/",SearchEnroll.as_view(), name="search-enroll"),
     path("enroll-by-search/",EnrollBySearch.as_view(),name="enrol-by-search"),
-    path("fetch-enrollment/",FetchNewEnrollment.as_view(),name="fetch-enrollemnt")
+    path("fetch-enrollment/",FetchNewEnrollment.as_view(),name="fetch-enrollemnt"),
+    
+    # 
+    path("my-users/",MyUsers.as_view(), name="my-users"),
     
     
 ]
