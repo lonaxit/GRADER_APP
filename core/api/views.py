@@ -1463,6 +1463,11 @@ class FirstAdmNumberView(APIView):
         return Response(serializer.data) 
 
 
+# my users
+class MyUsers(generics.ListAPIView):
+    queryset = User.objects.all()
+    serializer_class = UserSerializer
+
 #Search student user by name
 class SearchEnroll(generics.ListAPIView):
     serializer_class = UserSerializer
