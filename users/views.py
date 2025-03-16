@@ -15,6 +15,8 @@ from rest_framework.response import Response
 # IMPORT CUSTOM USER
 from django.contrib.auth import get_user_model
 User = get_user_model()
+from django.utils import timezone
+from datetime import timedelta
 
 from .serializers  import *
 
@@ -150,14 +152,23 @@ class GetUserWithUsername(APIView):
 
 class retrieveAllUsers(APIView):
     # permission_classes = [IsAuthenticated, IsAuthOrReadOnly]
-
+    
     def get(self, request):
         try:
-            users = User.objects.all()
+            last_30_days = timezone.now() - timedelta(days=30)
+            users = User.objects.filter(date_joined__gte=last_30_days)
             serializer = UserSerializer(users, many=True)
-            return Response({'user': serializer.data}, status=status.HTTP_200_OK)
+            return Response({'users': serializer.data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+    # def get(self, request):
+    #     try:
+    #         users = User.objects.all()
+    #         serializer = UserSerializer(users, many=True)
+    #         return Response({'user': serializer.data}, status=status.HTTP_200_OK)
+    #     except Exception as e:
+    #         return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
         
 # class retrieveAllUsers(APIView):
 #     # permission_classes = [IsAuthenticated,IsAuthOrReadOnly]
