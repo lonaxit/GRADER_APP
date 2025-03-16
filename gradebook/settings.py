@@ -28,10 +28,10 @@ SECRET_KEY = env('SECRET_KEY')
 DEBUG = env('DEBUG')
 
 # production
-# ALLOWED_HOSTS = ['skygiftedacademy.up.railway.app']
+ALLOWED_HOSTS = ['skygiftedacademy.up.railway.app']
 
 # dev
-ALLOWED_HOSTS = ['*']
+# ALLOWED_HOSTS = ['*']
 
 
 # Application definition
@@ -63,7 +63,8 @@ CORS_ALLOW_ALL_ORIGINS: False
 
 # was present from production
 CORS_ALLOWED_ORIGINS = [
-    # "http://localhost:8080"
+    # "http://localhost:8080",
+    "https://skygiftedacademy.up.railway.app",
     "https://skygiftedacademyfrontend.onrender.com"
     # "https://www.skygiftedacademymkar.net",
   
