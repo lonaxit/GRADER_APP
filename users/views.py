@@ -16,7 +16,8 @@ from rest_framework.response import Response
 from django.contrib.auth import get_user_model
 User = get_user_model()
 from django.utils import timezone
-from datetime import timedelta
+from datetime import datetime,timedelta
+
 
 from .serializers  import *
 
@@ -155,10 +156,13 @@ class retrieveAllUsers(APIView):
     
     def get(self, request):
         try:
-            current_date = timezone.now()
-            print(current_date)
-            start_date = current_date - timedelta(days=30)
-            users = User.objects.filter(date_joined__range=(start_date, current_date))
+            current_date = datetime.today().date()
+
+            # Calculate the date 30 days ago
+            last_30_days_date = current_date - timedelta(days=30)
+            
+        
+            users = User.objects.filter(date_joined__range=(last_30_days_date, current_date))
             serializer = UserSerializer(users, many=True)
             return Response({'users': serializer.data}, status=status.HTTP_200_OK)
         except Exception as e:
