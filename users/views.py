@@ -156,6 +156,7 @@ class retrieveAllUsers(APIView):
     def get(self, request):
         try:
             current_date = timezone.now()
+            print(current_date)
             start_date = current_date - timedelta(days=30)
             users = User.objects.filter(date_joined__range=(start_date, current_date))
             serializer = UserSerializer(users, many=True)
