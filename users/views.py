@@ -149,18 +149,31 @@ class GetUserWithUsername(APIView):
                 status= status.HTTP_200_OK
             )      
             
-
-class retrieveAllUsers(APIView):
+# 
+class RetrieveAllUsers(APIView):
     # permission_classes = [IsAuthenticated, IsAuthOrReadOnly]
     
     def get(self, request):
         try:
-            last_30_days = timezone.now() - timedelta(days=30)
-            users = User.objects.filter(date_joined__gte=last_30_days)
+            current_date = timezone.now()
+            start_date = current_date - timedelta(days=30)
+            users = User.objects.filter(date_joined__range=(start_date, current_date))
             serializer = UserSerializer(users, many=True)
             return Response({'users': serializer.data}, status=status.HTTP_200_OK)
         except Exception as e:
             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+# class retrieveAllUsers(APIView):
+#     # permission_classes = [IsAuthenticated, IsAuthOrReadOnly]
+    
+#     def get(self, request):
+#         try:
+#             last_30_days = timezone.now() - timedelta(days=30)
+#             users = User.objects.filter(date_joined__gte=last_30_days)
+#             serializer = UserSerializer(users, many=True)
+#             return Response({'users': serializer.data}, status=status.HTTP_200_OK)
+#         except Exception as e:
+#             return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
     # def get(self, request):
     #     try:
