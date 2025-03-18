@@ -150,7 +150,7 @@ class GetUserWithUsername(APIView):
             )      
             
 # 
-class RetrieveAllUsers(APIView):
+class retrieveAllUsers(APIView):
     # permission_classes = [IsAuthenticated, IsAuthOrReadOnly]
     
     def get(self, request):
