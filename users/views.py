@@ -163,7 +163,7 @@ class retrieveAllUsers(APIView):
             last_30_days_date = current_date - timedelta(days=30)
             
         
-            users = User.objects.filter(date_joined__range=(last_30_days_date, current_date))
+            users = User.objects.filter(created_on__range=(last_30_days_date, current_date))
             serializer = UserSerializer(users, many=True)
             return Response({'users': serializer.data}, status=status.HTTP_200_OK)
         except Exception as e:
