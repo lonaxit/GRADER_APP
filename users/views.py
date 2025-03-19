@@ -160,7 +160,8 @@ class retrieveAllUsers(APIView):
             today = timezone.now().date()  # Ensure we use timezone-aware date
             last_week = today - timedelta(days=7)
             
-            users = User.objects.filter(created_on__range=(last_week, today))
+            # users = User.objects.filter(created_on__range=(last_week, today))
+            users = User.objects.filter(date_joined__gte=today)
             serializer = UserSerializer(users, many=True)
             return Response({'users': serializer.data}, status=status.HTTP_200_OK)
         except Exception as e:
