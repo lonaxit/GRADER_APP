@@ -157,13 +157,10 @@ class retrieveAllUsers(APIView):
     
     def get(self, request):
         try:
-            current_date = datetime.today().date()
-
-            # Calculate the date 30 days ago
-            last_30_days_date = current_date - timedelta(days=30)
+            today = timezone.now().date()  # Ensure we use timezone-aware date
+            last_week = today - timedelta(days=7)
             
-        
-            users = User.objects.filter(created_on__range=(last_30_days_date, current_date))
+            users = User.objects.filter(created_on__range=(last_week, today))
             serializer = UserSerializer(users, many=True)
             return Response({'users': serializer.data}, status=status.HTTP_200_OK)
         except Exception as e:
