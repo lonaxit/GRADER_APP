@@ -55,13 +55,13 @@ class EnrollBySearchSerializer(serializers.ModelSerializer):
     
 # user app
 class UserSerializer(serializers.ModelSerializer):
-    studentprofile = StudentProfileSerializer(read_only=True) #parent model
+    # studentprofile = StudentProfileSerializer(read_only=True) #parent model
    
     class Meta:
         model = User
         # fields = ('id','username','first_name')
         # fields = '__all__'
-        exclude=('password','last_login','is_superuser','user_permissions','groups',)
+        exclude=('password','last_login','is_superuser','user_permissions','groups','avatar','dob','phone',)
  
 
 class TeacherProfileSerializer(serializers.ModelSerializer):
