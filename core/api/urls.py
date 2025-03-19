@@ -133,8 +133,6 @@ urlpatterns =[
     path("enroll-by-search/",EnrollBySearch.as_view(),name="enrol-by-search"),
     path("fetch-enrollment/",FetchNewEnrollment.as_view(),name="fetch-enrollemnt"),
     
-    # 
-    path("my-users/",MyUsers.as_view(), name="my-users"),
     
     
 ]
