@@ -1463,13 +1463,6 @@ class FirstAdmNumberView(APIView):
         return Response(serializer.data) 
 
 
-# my users
-class MyUsers(generics.ListAPIView):
-    serializer_class = UserSerializer
-
-    def get_queryset(self):
-        return User.objects.all()[:20]  # Retrieve only the first 20 records
-
 #Search student user by name
 class SearchEnroll(generics.ListAPIView):
     serializer_class = UserSerializer

@@ -111,6 +111,7 @@ class RegistrationView(APIView):
                 status = status.HTTP_400_BAD_REQUEST
                 )    
         except Exception as e:
+            print(e)
             return Response(
                 {'msg':e},
                 status =status.HTTP_500_INTERNAL_SERVER_ERROR
