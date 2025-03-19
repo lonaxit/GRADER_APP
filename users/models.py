@@ -3,6 +3,7 @@ from django.db import models
 from django.utils import timezone
 from datetime import date
 import datetime
+from django.utils.timezone import now
 
 from django.contrib.auth.models import AbstractBaseUser, PermissionsMixin, BaseUserManager
 
@@ -76,7 +77,7 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
     avatar = models.ImageField(null=True,blank=True)
     # date_joined = models.DateTimeField(default=timezone.now)
     date_joined = models.DateTimeField(auto_now_add=True)
-    created_on = models.DateField(default=datetime.date.today)
+    created_on = models.DateField(default=now) 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_student = models.BooleanField(default=False)
