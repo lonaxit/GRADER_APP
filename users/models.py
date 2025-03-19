@@ -77,7 +77,7 @@ class CustomUser(AbstractBaseUser,PermissionsMixin):
     avatar = models.ImageField(null=True,blank=True)
     # date_joined = models.DateTimeField(default=timezone.now)
     date_joined = models.DateTimeField(default=timezone.now)
-    created_on = models.DateField(default=now) 
+    # created_on = models.DateField(default=now) 
     is_active = models.BooleanField(default=True)
     is_staff = models.BooleanField(default=False)
     is_student = models.BooleanField(default=False)
