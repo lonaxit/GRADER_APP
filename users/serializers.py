@@ -15,7 +15,7 @@ class StdProfileSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = StudentProfile
-        fields = ('id',)
+        fields = ('id','user',)
         
 class StudentProfileSerializer(serializers.ModelSerializer): #child model
     
