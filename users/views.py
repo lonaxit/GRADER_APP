@@ -165,7 +165,7 @@ class retrieveAllUsers(APIView):
             
             today = timezone.now()
           
-            one_days_ago = today - timedelta(days=2)
+            one_days_ago = today - timedelta(days=3)
             users = User.objects.filter(date_joined__gte=one_days_ago)
             serializer = UserSerializer(users, many=True)
             return Response({'users': serializer.data}, status=status.HTTP_200_OK)
