@@ -10,7 +10,13 @@ from django.contrib.auth import get_user_model
 User = get_user_model()
 
 # other serializers
-
+class StdProfileSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+    
+    class Meta:
+        model = StudentProfile
+        fields = ('id',)
+        
 class StudentProfileSerializer(serializers.ModelSerializer): #child model
     
     user = serializers.StringRelatedField()
@@ -56,6 +62,7 @@ class EnrollBySearchSerializer(serializers.ModelSerializer):
 # user app
 class UserSerializer(serializers.ModelSerializer):
     # studentprofile = StudentProfileSerializer(read_only=True) #parent model
+    studentprofile = StdProfileSerializer(read_only=True)
    
     class Meta:
         model = User
