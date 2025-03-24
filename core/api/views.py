@@ -373,9 +373,9 @@ class SubjectTeacherCreateAPIView(generics.CreateAPIView):
         # classroom = serializer.validated_data['classroom']
         # sessionId = serializer.validated_data['session']
         print(subject)
-        subj = Subject.objects.get(pk=subject)
-        class_ = SchoolClass.objects.get(pk=classroom)
-        session_ = Session.objects.get(pk=sessionId)
+        subj = Subject.objects.get(pk=subject.pk)
+        class_ = SchoolClass.objects.get(pk=classroom.pk)
+        session_ = Session.objects.get(pk=sessionId.pk)
         # subject = serializer.validated_data['subject']
         # classroom = serializer.validated_data['classroom']
         # sessionId = serializer.validated_data['session']
