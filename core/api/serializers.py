@@ -101,13 +101,14 @@ class SubjectTeacherSerializer(serializers.ModelSerializer):
     # teacher = serializers.StringRelatedField(read_only=True)
     teacher_name = serializers.SerializerMethodField()
     # session_name = serializers.SerializerMethodField()
-    # subject_name = serializers.SerializerMethodField()
-    # class_name = serializers.SerializerMethodField()
+    subject_name = serializers.SerializerMethodField()
+    class_name = serializers.SerializerMethodField()
     teacherid = serializers.SerializerMethodField()
 
     class Meta:
         model = SubjectTeacher
-        fields = "__all__"
+        # fields = "__all__"
+        exclude = ('status','date_created','date_modified',)
     
     def get_teacher_name(self,object):
                
@@ -123,15 +124,15 @@ class SubjectTeacherSerializer(serializers.ModelSerializer):
     #     session = Session.objects.get(pk=object.session.pk)
     #     return session.name
     
-    # def get_class_name(self,object):
+    def get_class_name(self,object):
                
-    #     _class = SchoolClass.objects.get(pk=object.classroom.pk)
-    #     return _class.class_name
+        _class = SchoolClass.objects.get(pk=object.classroom.pk)
+        return _class.class_name
     
-    # def get_subject_name(self,object):
+    def get_subject_name(self,object):
                
-    #     _subject = Subject.objects.get(pk=object.subject.pk)
-    #     return _subject.name
+        _subject = Subject.objects.get(pk=object.subject.pk)
+        return _subject.name
 
 
 
