@@ -366,16 +366,19 @@ class SubjectTeacherCreateAPIView(generics.CreateAPIView):
         # get movie
         user= User.objects.get(pk=pk)
         
-        subject = serializer.validated_data.get('subject')
-        classroom = serializer.validated_data.get('classroom')
-        sessionId = serializer.validated_data.get('session')
+        # subject = serializer.validated_data.get('subject')
+        # classroom = serializer.validated_data.get('classroom')
+        # sessionId = serializer.validated_data.get('session')
+        subject = self.request.data.get("subject")
+        classroom = self.request.data.get("classroom")
+        session = self.request.data.get("session")
         # subject = serializer.validated_data['subject']
         # classroom = serializer.validated_data['classroom']
         # sessionId = serializer.validated_data['session']
         print(subject)
         subj = Subject.objects.get(pk=subject.pk)
         class_ = SchoolClass.objects.get(pk=classroom.pk)
-        session_ = Session.objects.get(pk=sessionId.pk)
+        session_ = Session.objects.get(pk=session)
         # subject = serializer.validated_data['subject']
         # classroom = serializer.validated_data['classroom']
         # sessionId = serializer.validated_data['session']
