@@ -99,7 +99,7 @@ class ResumptionSettingSerializer(serializers.ModelSerializer):
 # subject teacher serializer
 class SubjectTeacherSerializer(serializers.ModelSerializer):
     # teacher = serializers.StringRelatedField(read_only=True)
-    # teacher_name = serializers.SerializerMethodField()
+    teacher_name = serializers.SerializerMethodField()
     # session_name = serializers.SerializerMethodField()
     # subject_name = serializers.SerializerMethodField()
     # class_name = serializers.SerializerMethodField()
@@ -109,10 +109,10 @@ class SubjectTeacherSerializer(serializers.ModelSerializer):
         model = SubjectTeacher
         fields = "__all__"
     
-    # def get_teacher_name(self,object):
+    def get_teacher_name(self,object):
                
-    #     teacherObj = User.objects.get(pk=object.teacher.pk)
-    #     return teacherObj.sur_name + ' ' + teacherObj.first_name
+        teacherObj = User.objects.get(pk=object.teacher.pk)
+        return teacherObj.sur_name + ' ' + teacherObj.first_name
     def get_teacherid(self,object):
                
         teacherObj = User.objects.get(pk=object.teacher.pk)
