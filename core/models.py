@@ -106,9 +106,9 @@ class TeacherProfile(models.Model):
 
 # assign subject teacher  
 class SubjectTeacher(models.Model):
-    subject = models.ForeignKey(Subject,on_delete=models.DO_NOTHING)
-    classroom = models.ForeignKey(SchoolClass,on_delete=models.DO_NOTHING)
-    session = models.ForeignKey(Session,on_delete=models.DO_NOTHING)
+    subject = models.ForeignKey(Subject,on_delete=models.DO_NOTHING,related_name='subjects')
+    classroom = models.ForeignKey(SchoolClass,on_delete=models.DO_NOTHING,related_name='classrooms')
+    session = models.ForeignKey(Session,on_delete=models.DO_NOTHING,related_name='sessions')
     teacher = models.ForeignKey(User,on_delete=models.CASCADE,related_name='teachersubjects')
     status = models.BooleanField(default=True)
     date_created = models.DateTimeField(auto_now_add=True,null=True,blank=True)
