@@ -369,6 +369,10 @@ class SubjectTeacherCreateAPIView(generics.CreateAPIView):
         subject = serializer.validated_data.get('subject')
         classroom = serializer.validated_data.get('classroom')
         sessionId = serializer.validated_data.get('session')
+        
+        subj = Subject.objects.get(pk=subject)
+        class_ = SchoolClass.objects.get(pk=classroom)
+        session_ = Session.objects.get(pk=sessionId)
         # subject = serializer.validated_data['subject']
         # classroom = serializer.validated_data['classroom']
         # sessionId = serializer.validated_data['session']
@@ -396,7 +400,7 @@ class SubjectTeacherCreateAPIView(generics.CreateAPIView):
         # movie.save()
         
         # save together with related watchlist and user
-        serializer.save(teacher=user)
+        serializer.save(teacher=user,subject=subj,classroom=class_,session=session_)
 
 
 class ToggleSubjectTeacherAPIView(generics.RetrieveUpdateAPIView):
