@@ -98,29 +98,29 @@ class ResumptionSettingSerializer(serializers.ModelSerializer):
 
 # subject teacher serializer
 class SubjectTeacherSerializer(serializers.ModelSerializer):
-    # teacher = serializers.StringRelatedField(read_only=True)
+    teacher = serializers.StringRelatedField(read_only=True)
     subject = serializers.StringRelatedField(read_only=True)
     classroom = serializers.StringRelatedField(read_only=True)
     session = serializers.StringRelatedField(read_only=True)
-    teacher_name = serializers.SerializerMethodField()
+    # teacher_name = serializers.SerializerMethodField()
     # session_name = serializers.SerializerMethodField()
     # subject_name = serializers.SerializerMethodField()
     # class_name = serializers.SerializerMethodField()
-    teacherid = serializers.SerializerMethodField()
+    # teacherid = serializers.SerializerMethodField()
 
     class Meta:
         model = SubjectTeacher
         # fields = "__all__"
         exclude = ('status','date_created','date_modified',)
     
-    def get_teacher_name(self,object):
+    # def get_teacher_name(self,object):
                
-        teacherObj = User.objects.get(pk=object.teacher.pk)
-        return teacherObj.sur_name + ' ' + teacherObj.first_name
-    def get_teacherid(self,object):
+    #     teacherObj = User.objects.get(pk=object.teacher.pk)
+    #     return teacherObj.sur_name + ' ' + teacherObj.first_name
+    # def get_teacherid(self,object):
                
-        teacherObj = User.objects.get(pk=object.teacher.pk)
-        return teacherObj.pk
+    #     teacherObj = User.objects.get(pk=object.teacher.pk)
+    #     return teacherObj.pk
     
     # def get_session_name(self,object):
                
