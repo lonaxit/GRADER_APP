@@ -387,7 +387,7 @@ class SubjectTeacherCreateAPIView(generics.CreateAPIView):
         # classroom = SchoolClass.objects.get(pk = classroom_id)
         
         # logic to prevent multple creation of subjectteacher by a user
-        _queryset = SubjectTeacher.objects.filter(teacher=user,subject=subject,classroom=classroom,session=sessionId)
+        _queryset = SubjectTeacher.objects.filter(teacher=user,subject=subject,classroom=classroom,session=session)
         
         if _queryset.exists():
             
