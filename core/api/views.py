@@ -890,8 +890,7 @@ class UploadTerminalAttendance(generics.CreateAPIView):
 
 # upload/import CA EXCEL SHEET
 class ImportAssessment(generics.CreateAPIView):
-    # serializer_class = ScoresSerializer
-    serializer_class = ScoreSerializer
+    serializer_class = ScoresSerializer
     parser_classes = (MultiPartParser, FormParser,)
     # permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
     permission_classes = [IsAuthenticated]
