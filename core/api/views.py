@@ -890,14 +890,15 @@ class UploadTerminalAttendance(generics.CreateAPIView):
 
 # upload/import CA EXCEL SHEET
 class ImportAssessment(generics.CreateAPIView):
-    serializer_class = ScoresSerializer
+    # serializer_class = ScoresSerializer
+    serializer_class = ScoreSerializer
     parser_classes = (MultiPartParser, FormParser,)
     # permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
     permission_classes = [IsAuthenticated]
     
-    def get_queryset(self):
+    # def get_queryset(self):
         # just return the review object
-        return Scores.objects.all()
+        # return Scores.objects.all()
     
     def post(self, request, *args, **kwargs):
         

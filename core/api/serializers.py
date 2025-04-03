@@ -172,6 +172,12 @@ class ClassTeacherSerializer(serializers.ModelSerializer):
         _class = SchoolClass.objects.get(pk=object.classroom.pk)
         return _class.class_name
     
+#score
+class ScoreSerializer(serializers.ModelSerializer):
+    
+    class Meta:
+        model = Scores 
+        fields = ("id",)
 
 
 class ScoresSerializer(serializers.ModelSerializer):
