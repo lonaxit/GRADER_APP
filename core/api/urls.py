@@ -77,6 +77,7 @@ urlpatterns =[
     
     path("export-sheet/",ExportSheet.as_view(),name="export-sheet"),
     path("import-sheet/",ImportAssessment.as_view(),name="import-sheet"),
+    path("build-scores/",BuidScores.as_view(),name="build-scores"),
     
     path("export-attendance-sheet/",ExportAttendanceSheet.as_view(),name="export-attendance-sheet"),
     
