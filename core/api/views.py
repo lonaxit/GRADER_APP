@@ -656,7 +656,57 @@ class UserScoresList(generics.ListAPIView):
             raise ValidationError("No records available")
         return queryset
 
+# code to build and process scores after uploading
+class BuidScores(generics.CreateAPIView):
+    serializer_class = ScoresSerializer
+    # permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
     
+    def get_queryset(self):
+        # just return the review object
+        return Scores.objects.all()
+    
+    def post(self, request, *args, **kwargs):
+        
+        
+        with transaction.atomic():
+            
+            try:
+                # Access form values from the request object
+                _class = request.data.get('studentclass')
+                # term = request.data.get('term')
+                # session = request.data.get('session')
+                subj = request.data.get('subj')
+                
+                classObj = SchoolClass.objects.get(pk=_class)
+                # termObj = Term.objects.get(pk=term)
+                # sessionObj = Session.objects.get(pk=session)
+                
+                
+                subjectObj = Subject.objects.get(pk=subj)   
+                activeTerm = Term.objects.get(status='True')
+                activeSession = Session.objects.get(status='True')
+                
+                # loggedInUser = request.user
+                
+                # _isteacher = ClassTeacher.objects.filter(tutor=loggedInUser,classroom=classObj)
+                # if not _isteacher:
+                #     raise ValidationError("You are not a class teacher for this class")
+                
+                
+                # process terminal scores
+                processScores(subjectObj,classObj,activeTerm,activeSession)
+
+            except Exception as e:
+                raise ValidationError(e)
+           
+        return Response(
+                {'msg':'Scores build/processed successfully'},
+                status = status.HTTP_201_CREATED
+                )
+
+
+
+ 
 class CreateResult(generics.CreateAPIView):
     serializer_class = ResultSerializer
     # permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
@@ -980,8 +1030,8 @@ class ImportAssessment(generics.CreateAPIView):
                                     
                                 obj.save()
                     
-                                    # process scores
-                    processScores(subjectObj,classObj,activeTerm,activeSession)
+                    # process scores -moved this to a different view BuildScores
+                    # processScores(subjectObj,classObj,activeTerm,activeSession)
                   
             except Exception as e:
                 
