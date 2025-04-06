@@ -17,10 +17,12 @@ class TermSerializer(serializers.ModelSerializer):
 # subject teacher serializer
 class SubjectTeacherSerializer(serializers.ModelSerializer):  
     # 
-    teacher = serializers.StringRelatedField(read_only=True)
-    subject = serializers.StringRelatedField(read_only=True)
-    classroom = serializers.StringRelatedField(read_only=True)
-    session = serializers.StringRelatedField(read_only=True)
+    # teacher = serializers.StringRelatedField(read_only=True)
+    # subject = serializers.StringRelatedField(read_only=True)
+    # classroom = serializers.StringRelatedField(read_only=True)
+    # session = serializers.StringRelatedField(read_only=True)
+    
+    # 
     # teacher_name = serializers.SerializerMethodField()
     # session_name = serializers.SerializerMethodField()
     # subject_name = serializers.SerializerMethodField()
@@ -192,7 +194,7 @@ class ScoresSerializer(serializers.ModelSerializer):
     session = SessionSerializer(read_only=True)  # Nested serializer for Session
     studentclass = SchoolClassSerializer(read_only=True)  # Nested serializer for SchoolClass
     subject = SubjectSerializer(read_only=True)  # Nested serializer for Subject
-    # subjectteacher = SubjectTeacherSerializer(many=True, read_only=True)  # Nested serializer for SubjectTeacher
+    subjectteacher = SubjectTeacherSerializer(read_only=True)  # Nested serializer for SubjectTeacher
     
     # 2
     
