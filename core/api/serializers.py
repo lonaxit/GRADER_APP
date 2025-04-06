@@ -211,7 +211,7 @@ class ScoresSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'term', 'session', 'studentclass', 'subject', 'subjectteacher',
             'firstscore', 'secondscore', 'thirdscore', 'totalca', 'examscore', 'subjecttotal',
             'subjaverage', 'subjectposition', 'subjectgrade', 'subjectrating', 'highest_inclass',
-            'lowest_inclass',)
+            'lowest_inclass','student',)
     
     # def get_student_name(self,object):
                
