@@ -2,6 +2,7 @@ from dataclasses import fields
 import profile
 from rest_framework import serializers
 from core.api.serializers import *
+# from core.models import *
 
 
 # IMPORT CUSTOM USER
@@ -61,6 +62,7 @@ class EnrollBySearchSerializer(serializers.ModelSerializer):
     
 # user app
 class UserSerializer(serializers.ModelSerializer):
+    teachersubjects = SubjectTeacherSerializer(many=True, read_only=True)
     # studentprofile = StudentProfileSerializer(read_only=True) #parent model
   
    
