@@ -7,6 +7,16 @@ from django.db.models import F
 User = get_user_model()
 from users.serializers import *
 
+
+# user app
+class UserSerializer(serializers.ModelSerializer):
+   
+    class Meta:
+        model = User
+        # fields = ('id','username','first_name')
+        # fields = '__all__'
+        exclude=('password','last_login','is_superuser','user_permissions','groups','avatar','dob','phone',)
+
 class TermSerializer(serializers.ModelSerializer):
 
     class Meta:
@@ -17,7 +27,7 @@ class TermSerializer(serializers.ModelSerializer):
 # subject teacher serializer
 class SubjectTeacherSerializer(serializers.ModelSerializer):  
     # 
-    # teacher = serializers.StringRelatedField(read_only=True)
+    teacher = UserSerializer(read_only=True)
     # subject = serializers.StringRelatedField(read_only=True)
     # classroom = serializers.StringRelatedField(read_only=True)
     # session = serializers.StringRelatedField(read_only=True)
@@ -189,7 +199,7 @@ class ScoreSerializer(serializers.ModelSerializer):
 
 class ScoresSerializer(serializers.ModelSerializer):
     # new
-    user = UserSerializer(read_only=True)  # Nested serializer for User
+    # user = UserSerializer(read_only=True)  # Nested serializer for User
     term = TermSerializer(read_only=True)  # Nested serializer for Term
     session = SessionSerializer(read_only=True)  # Nested serializer for Session
     studentclass = SchoolClassSerializer(read_only=True)  # Nested serializer for SchoolClass
