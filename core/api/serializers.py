@@ -189,7 +189,7 @@ class ScoresSerializer(serializers.ModelSerializer):
     # new
     # student = UserSerializer(read_only=True)  # Nested serializer for User
     term = TermSerializer(read_only=True)  # Nested serializer for Term
-    # session = SessionSerializer(many=True, read_only=True)  # Nested serializer for Session
+    session = SessionSerializer(read_only=True)  # Nested serializer for Session
     # studentclass = SchoolClassSerializer(many=True, read_only=True)  # Nested serializer for SchoolClass
     # subject = SubjectSerializer(many=True, read_only=True)  # Nested serializer for Subject
     # subjectteacher = SubjectTeacherSerializer(many=True, read_only=True)  # Nested serializer for SubjectTeacher
