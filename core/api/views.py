@@ -1621,10 +1621,9 @@ class EnrollBySearch(generics.CreateAPIView):
                 classObj = SchoolClass.objects.get(pk=class_id)
                 
                 # get admission number
-                # This code was used to initially enroll students
-                # adm_number = AdmissionNumber.objects.filter(status='No').first()
-                # string_number = str(adm_number.serial_no)
-                # admissionstring = 'SKY/STDM/'+activeSession.name+'/'+string_number
+                adm_number = AdmissionNumber.objects.filter(status='No').first()
+                string_number = str(adm_number.serial_no)
+                admissionstring = 'SKY/STDM/'+activeSession.name+'/'+string_number
                 
                 # check if student is already enrolled
                 studentEnrolled = Classroom.objects.filter(Q(term=activeTerm.pk) & Q(session=activeSession.pk) & Q (class_room=classObj.pk) & Q(student=userObj.pk))
@@ -1633,16 +1632,16 @@ class EnrollBySearch(generics.CreateAPIView):
                     raise ValidationError("You are already enrolled")
                 
                 # Create StudentProfile
-                # myProfile = StudentProfile.objects.create(
-                #     guardian = userObj.sur_name,
-                #     user_id= userObj.pk,
-                #     class_admitted_id =classObj.pk,
-                #     session_admitted_id=activeSession.pk,
-                #     term_admitted_id=activeTerm.pk,
-                #     admission_number =adm_number.serial_no,
-                #     admission_numberstring = admissionstring
-                # )
-                # myProfile.save()
+                myProfile = StudentProfile.objects.create(
+                    guardian = userObj.sur_name,
+                    user_id= userObj.pk,
+                    class_admitted_id =classObj.pk,
+                    session_admitted_id=activeSession.pk,
+                    term_admitted_id=activeTerm.pk,
+                    admission_number =adm_number.serial_no,
+                    admission_numberstring = admissionstring
+                )
+                myProfile.save()
                 
                 enrollObj = Classroom.objects.create(
                         class_room=classObj,
@@ -1652,8 +1651,8 @@ class EnrollBySearch(generics.CreateAPIView):
                         )
                 enrollObj.save()
                 
-                # adm_number.status='Yes'
-                # adm_number.save()
+                adm_number.status='Yes'
+                adm_number.save()
                 
   
             except Exception as e:
