@@ -1090,14 +1090,25 @@ class GetResult(generics.ListAPIView):
         # _term = self.request.data.get('term')
         payload = self.request.query_params
         
-        myclass = payload.get('classroom')
+        # myclass = payload.get('classroom')
+        # classObj = SchoolClass.objects.get(pk=myclass)
+        # termObj = Term.objects.get(pk=payload.get('term'))
+        # sessionObj = Session.objects.get(pk=payload.get('session'))
+       
+        classObj = get_object_or_404(SchoolClass, pk=payload.get('classroom'))
+        termObj = get_object_or_404(Term, pk=payload.get('term'))
+        sessionObj = get_object_or_404(Session, pk=payload.get('session'))
         
-        classObj = SchoolClass.objects.get(pk=myclass)
-        termObj = Term.objects.get(pk=payload.get('term'))
-        sessionObj = Session.objects.get(pk=payload.get('session'))
+    
         
         # Example: Fetching data based on a filter field named 'filter_field'
-        queryset = Result.objects.filter(studentclass=classObj,session=sessionObj,term=termObj)
+        queryset = Result.objects.select_related(
+            'student',
+            'term',
+            'session',
+            'studentclass',
+            'classteacher',
+        ).filter(studentclass=classObj,session=sessionObj,term=termObj)
         
         if not queryset:
             raise ValidationError("No records matching your criteria")
