@@ -12,6 +12,7 @@ from core.api.permissions import *
 # from core.api.utilities import *
 from django.http import HttpResponse,JsonResponse
 from rest_framework.exceptions import NotFound
+from django.shortcuts import get_object_or_404
 
 import csv
 
@@ -597,6 +598,40 @@ class FindScoresAPIView(APIView):
         # Serialize the data and return the response
         serializer = ScoresSerializer(queryset, many=True)
         return Response(serializer.data)
+    
+# new optimize code
+
+
+
+class FindScoresAPIView(APIView):
+    def get(self, request):
+        payload = request.query_params
+
+        subjObj = get_object_or_404(Subject, pk=payload.get('subject'))
+        classObj = get_object_or_404(SchoolClass, pk=payload.get('studentclass'))
+        termObj = get_object_or_404(Term, pk=payload.get('term'))
+        sessionObj = get_object_or_404(Session, pk=payload.get('session'))
+
+        # Optimize the queryset by selecting related foreign key objects
+        queryset = Scores.objects.select_related(
+            'subject',
+            'studentclass',
+            'term',
+            'session',
+            'student'  # assuming there is a foreign key to Student
+        ).filter(
+            subject=subjObj,
+            studentclass=classObj,
+            term=termObj,
+            session=sessionObj
+        )
+
+        if not queryset.exists():
+            raise ValidationError("No records matching your criteria")
+
+        serializer = ScoresSerializer(queryset, many=True)
+        return Response(serializer.data)
+
     
 # get scores based on term, session and class
 class FilterTerminalScoresAPIView(APIView):
