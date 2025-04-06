@@ -235,7 +235,8 @@ class ResultSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Result
-        exclude = ('date_created','date_modified',)
+        # exclude = ('date_created','date_modified',)
+        fields= "__all__"
     
     # def get_student_name(self,object):
                
