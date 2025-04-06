@@ -1110,7 +1110,7 @@ class GetResult(generics.ListAPIView):
             'classteacher',
         ).filter(studentclass=classObj,session=sessionObj,term=termObj)
         
-        if not queryset:
+        if not queryset.exists():
             raise ValidationError("No records matching your criteria")
         return queryset
 
