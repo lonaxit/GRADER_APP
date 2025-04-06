@@ -188,7 +188,7 @@ class ScoreSerializer(serializers.ModelSerializer):
 class ScoresSerializer(serializers.ModelSerializer):
     # new
     # student = UserSerializer(read_only=True)  # Nested serializer for User
-    scores_terms = TermSerializer(many=True, read_only=True)  # Nested serializer for Term
+    term = TermSerializer(read_only=True)  # Nested serializer for Term
     # session = SessionSerializer(many=True, read_only=True)  # Nested serializer for Session
     # studentclass = SchoolClassSerializer(many=True, read_only=True)  # Nested serializer for SchoolClass
     # subject = SubjectSerializer(many=True, read_only=True)  # Nested serializer for Subject
@@ -211,7 +211,7 @@ class ScoresSerializer(serializers.ModelSerializer):
         fields = ('id', 'user', 'term', 'session', 'studentclass', 'subject', 'subjectteacher',
             'firstscore', 'secondscore', 'thirdscore', 'totalca', 'examscore', 'subjecttotal',
             'subjaverage', 'subjectposition', 'subjectgrade', 'subjectrating', 'highest_inclass',
-            'lowest_inclass','scores_terms',)
+            'lowest_inclass',)
     
     # def get_student_name(self,object):
                
