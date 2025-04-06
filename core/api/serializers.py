@@ -28,45 +28,13 @@ class TermSerializer(serializers.ModelSerializer):
 class SubjectTeacherSerializer(serializers.ModelSerializer):  
     # 
     teacher = UserSerializer(read_only=True)
-    # subject = serializers.StringRelatedField(read_only=True)
-    # classroom = serializers.StringRelatedField(read_only=True)
-    # session = serializers.StringRelatedField(read_only=True)
-    
-    # 
-    # teacher_name = serializers.SerializerMethodField()
-    # session_name = serializers.SerializerMethodField()
-    # subject_name = serializers.SerializerMethodField()
-    # class_name = serializers.SerializerMethodField()
-    # teacherid = serializers.SerializerMethodField()
+
 
     class Meta:
         model = SubjectTeacher
         # fields = "__all__"
         exclude = ('status','date_created','date_modified',)
     
-    # def get_teacher_name(self,object):
-               
-    #     teacherObj = User.objects.get(pk=object.teacher.pk)
-    #     return teacherObj.sur_name + ' ' + teacherObj.first_name
-    # def get_teacherid(self,object):
-               
-    #     teacherObj = User.objects.get(pk=object.teacher.pk)
-    #     return teacherObj.pk
-    
-    # def get_session_name(self,object):
-               
-    #     session = Session.objects.get(pk=object.session.pk)
-    #     return session.name
-    
-    # def get_class_name(self,object):
-               
-    #     _class = SchoolClass.objects.get(pk=object.classroom.pk)
-    #     return _class.class_name
-    
-    # def get_subject_name(self,object):
-               
-    #     _subject = Subject.objects.get(pk=object.subject.pk)
-    #     return _subject.name
     
 class SessionSerializer(serializers.ModelSerializer):
     # sessions = SubjectTeacherSerializer(many=True,read_only=True)
@@ -159,7 +127,7 @@ class ResumptionSettingSerializer(serializers.ModelSerializer):
 
 # class teacher serializer
 class ClassTeacherSerializer(serializers.ModelSerializer):
-    # tutor = UserSerializer(read_only=True)
+    tutor = UserSerializer(read_only=True)
     # tutor = serializers.StringRelatedField(read_only=True)
     # teacher_name = serializers.SerializerMethodField()
     # session_name = serializers.SerializerMethodField()
@@ -168,7 +136,7 @@ class ClassTeacherSerializer(serializers.ModelSerializer):
 
     class Meta:
         model = ClassTeacher
-        fields = ('date_created','date_modified',)
+        exclude = ('date_created','date_modified',)
     
     # def get_teacher_name(self,object):
                
