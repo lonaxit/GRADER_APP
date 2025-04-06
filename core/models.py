@@ -133,11 +133,11 @@ class ClassTeacher(models.Model):
     
 class Scores(models.Model):
     user = models.ForeignKey(User,on_delete=models.CASCADE, related_name='student')
-    term = models.ForeignKey(Term,on_delete=models.DO_NOTHING)
-    session = models.ForeignKey(Session,on_delete=models.DO_NOTHING)
-    studentclass = models.ForeignKey(SchoolClass,on_delete=models.DO_NOTHING)
-    subject = models.ForeignKey(Subject,on_delete=models.DO_NOTHING)
-    subjectteacher = models.ForeignKey(SubjectTeacher,on_delete=models.DO_NOTHING)
+    term = models.ForeignKey(Term,on_delete=models.DO_NOTHING, related_name="scores_terms")
+    session = models.ForeignKey(Session,on_delete=models.DO_NOTHING, related_name="scores_sessions")
+    studentclass = models.ForeignKey(SchoolClass,on_delete=models.DO_NOTHING,related_name="scores_class")
+    subject = models.ForeignKey(Subject,on_delete=models.DO_NOTHING,related_name="scores_subjects")
+    subjectteacher = models.ForeignKey(SubjectTeacher,on_delete=models.DO_NOTHING,related_name="scores_teacher")
     firstscore = models.DecimalField(max_digits=20, decimal_places=2,null=True,blank=True)
     secondscore = models.DecimalField(max_digits=20, decimal_places=2,null=True,blank=True)
     thirdscore = models.DecimalField(max_digits=20, decimal_places=2,null=True,blank=True)
