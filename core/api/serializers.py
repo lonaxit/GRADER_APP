@@ -159,7 +159,7 @@ class ResumptionSettingSerializer(serializers.ModelSerializer):
 
 # class teacher serializer
 class ClassTeacherSerializer(serializers.ModelSerializer):
-    tutor = UserSerializer(read_only=True)
+    # tutor = UserSerializer(read_only=True)
     # tutor = serializers.StringRelatedField(read_only=True)
     # teacher_name = serializers.SerializerMethodField()
     # session_name = serializers.SerializerMethodField()
