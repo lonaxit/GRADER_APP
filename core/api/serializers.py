@@ -187,7 +187,7 @@ class ScoreSerializer(serializers.ModelSerializer):
 
 class ScoresSerializer(serializers.ModelSerializer):
     # new
-    student = UserSerializer(read_only=True)  # Nested serializer for User
+    # student = UserSerializer(read_only=True)  # Nested serializer for User
     # term = TermSerializer(many=True, read_only=True)  # Nested serializer for Term
     # session = SessionSerializer(many=True, read_only=True)  # Nested serializer for Session
     # studentclass = SchoolClassSerializer(many=True, read_only=True)  # Nested serializer for SchoolClass
