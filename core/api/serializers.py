@@ -198,7 +198,7 @@ class ResultSerializer(serializers.ModelSerializer):
     # session_name = serializers.SerializerMethodField()
     # class_name = serializers.SerializerMethodField()
     # term_name = serializers.SerializerMethodField()
-    # admission_number = serializers.SerializerMethodField()
+    admission_number = serializers.SerializerMethodField()
     # user_id = serializers.SerializerMethodField()
     
     class Meta:
@@ -231,10 +231,10 @@ class ResultSerializer(serializers.ModelSerializer):
     #     _class = SchoolClass.objects.get(pk=object.studentclass.pk)
     #     return _class.code
     
-    # def get_admission_number(self,object):
+    def get_admission_number(self,object):
                
-    #      std = StudentProfile.objects.get(user=object.student.pk)
-    #      return std.admission_numberstring
+         std = StudentProfile.objects.get(user=object.student.pk)
+         return std.admission_numberstring
      
     # def get_user_id(self,object):
                
