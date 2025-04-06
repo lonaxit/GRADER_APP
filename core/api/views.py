@@ -614,11 +614,12 @@ class FindScoresAPIView(APIView):
 
         # Optimize the queryset by selecting related foreign key objects
         queryset = Scores.objects.select_related(
-            'subject',
-            'studentclass',
+            'user',
             'term',
             'session',
-            'student'  # assuming there is a foreign key to Student
+            'studentclass',
+            'subject',
+            'subjectteacher'
         ).filter(
             subject=subjObj,
             studentclass=classObj,
