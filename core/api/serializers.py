@@ -163,8 +163,7 @@ class ScoreSerializer(serializers.ModelSerializer):
     
     class Meta:
         model = Scores 
-        fields = ("id",)
-
+        fields = "__all__"
 
 class ScoresSerializer(serializers.ModelSerializer):
     # new
