@@ -160,10 +160,13 @@ class ClassTeacherSerializer(serializers.ModelSerializer):
     
 #score
 class ScoreSerializer(serializers.ModelSerializer):
+    user = serializers.StringRelatedField()
+    subjectteacher = serializers.StringRelatedField()
     
     class Meta:
         model = Scores 
         fields = "__all__"
+
 
 class ScoresSerializer(serializers.ModelSerializer):
     # new
