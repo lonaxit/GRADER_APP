@@ -511,7 +511,7 @@ class ScoresListAPIView(generics.ListAPIView):
 # create individual score
 class ScoresCreateAPIView(generics.CreateAPIView):
     queryset = Scores.objects.all()
-    serializer_class = ScoresSerializer
+    serializer_class = ScoreSerializer
     # permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
     
     
