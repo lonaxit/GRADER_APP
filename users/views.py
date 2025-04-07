@@ -27,7 +27,7 @@ from rest_framework.permissions import *
 from django.contrib.auth.hashers import make_password
 
 from rest_framework.parsers import MultiPartParser,FormParser
-from users.pagination import UserPagination
+from .pagination import UserPagination
 
 import openpyxl
 import pandas as pd
