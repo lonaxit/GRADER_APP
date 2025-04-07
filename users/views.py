@@ -176,7 +176,7 @@ class GetUserWithUsername(APIView):
 
 class retrieveAllUsers(APIView):
     # permission_classes = [IsAuthenticated,IsAuthOrReadOnly]
-    pagination_class = UserPagination
+    # pagination_class = UserPagination
     
     def get(self,request):
         try:
