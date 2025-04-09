@@ -63,7 +63,7 @@ class EnrollBySearchSerializer(serializers.ModelSerializer):
 # user app
 class UserSerializer(serializers.ModelSerializer):
     # teachersubjects = SubjectTeacherSerializer(many=True, read_only=True)
-    studentprofile = StudentProfileSerializer(read_only=True) #parent model
+    # studentprofile = StudentProfileSerializer(read_only=True) #parent model
   
    
     class Meta:
