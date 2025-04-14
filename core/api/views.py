@@ -686,7 +686,13 @@ class UserScoresList(generics.ListAPIView):
         
         
         # Example: Fetching data based on a filter field named 'filter_field'
-        queryset = Scores.objects.filter(user=userid,term=termid,session=sessionid,studentclass=classid)
+        # queryset = Scores.objects.filter(user=userid,term=termid,session=sessionid,studentclass=classid)
+        queryset = Scores.objects.filter(
+        user=userid,
+        term=termid,
+        session=sessionid,
+        studentclass=classid
+        ).select_related('user', 'term', 'session', 'studentclass')
         
         if not queryset:
             raise ValidationError("No records available")
@@ -1319,7 +1325,15 @@ class GetStudentAffectiveTraits(generics.ListAPIView):
         
         
         # Example: Fetching data based on a filter field named 'filter_field'
-        queryset = Studentaffective.objects.filter(studentclass=classObj,session=sessionObj,term=termObj,student=user)
+        # queryset = Studentaffective.objects.filter(studentclass=classObj,session=sessionObj,term=termObj,student=user)
+        
+        queryset = Studentaffective.objects.filter(
+        studentclass=classObj,
+        session=sessionObj,
+        term=termObj,
+        student=user
+        ).select_related('student', 'studentclass', 'session', 'term')
+        
         
         if not queryset:
             raise ValidationError("No records matching your criteria")
@@ -1344,7 +1358,11 @@ class GetStudentPsychoTraits(generics.ListAPIView):
         
         
         # Example: Fetching data based on a filter field named 'filter_field'
-        queryset = Studentpsychomotor.objects.filter(studentclass=classObj,session=sessionObj,term=termObj,student=user)
+        queryset = Studentpsychomotor.objects.filter(
+            studentclass=classObj,
+            session=sessionObj,
+            term=termObj,
+            student=user).select_related('studentclass','session','term','student')
         
         if not queryset:
             raise ValidationError("No records matching your criteria")
@@ -1532,7 +1550,11 @@ class RollCallAPIView(APIView):
         sessionObj = Session.objects.get(pk=payload.get('session'))
 
         # Example usage: filtering queryset based on payload parameters
-        queryset = Classroom.objects.filter(class_room=classObj,session=sessionObj,term=termObj)
+        queryset = Classroom.objects.filter(
+            class_room=classObj,
+            session=sessionObj,
+            term=termObj).select_related('class_room','session','term')
+        
         if not queryset:
             raise ValidationError("No records matching your criteria")
         
