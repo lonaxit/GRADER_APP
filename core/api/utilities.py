@@ -283,9 +283,9 @@ def processAffective(classroom,session,term):
     # list affetive items
     # affective = Studentaffective.objects.filter(studentclass=classroom.pk,term=term.pk,session=session.pk)
     affective = Studentaffective.objects.filter(
-    studentclass=classroom.pk,
-    term=term.pk,
-    session=session.pk
+    studentclass=classroom,
+    term=term,
+    session=session
     ).select_related('studentclass', 'term', 'session')
     
     if not affective:
@@ -307,7 +307,7 @@ def processAffective(classroom,session,term):
                 pass
             else:
                 # select three random affective skills
-                affective_skills = Affective.objects.all().order_by("?")[:3]
+                affective_skills = Affective.objects.all().order_by("?")[:2]
                 # select rating
                 rating = Rating.objects.get(pk=3)
 
