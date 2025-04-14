@@ -248,9 +248,9 @@ def processPsycho(classroom,session,term):
         # select Distinct students from result table
         # studentsResultList = Result.objects.filter(studentclass=classroom.pk,session=session.pk,term=term.pk).distinct('student')
         studentsResultList = Result.objects.filter(
-        studentclass=classroom.pk,
-        session=session.pk,
-        term=term.pk
+        studentclass=classroom,
+        session=session,
+        term=term
         ).select_related('studentclass', 'session', 'term').distinct('student')
         # Get class teacher
   
@@ -261,7 +261,7 @@ def processPsycho(classroom,session,term):
                 pass
             else:
                 # select three random random skills
-                psycho_skills = Psychomotor.objects.all().order_by("?")[:3]
+                psycho_skills = Psychomotor.objects.all().order_by("?")[:2]
                 # select rating
                 rating = Rating.objects.get(pk=3)
 
