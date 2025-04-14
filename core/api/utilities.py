@@ -237,12 +237,21 @@ def processPsycho(classroom,session,term):
 
  
     # list psycho items
-    psychoList = Studentpsychomotor.objects.filter(studentclass=classroom.pk,term=term.pk,session=session.pk)
+    # psychoList = Studentpsychomotor.objects.filter(studentclass=classroom.pk,term=term.pk,session=session.pk)
+    psychoList = Studentpsychomotor.objects.filter(
+    studentclass=classroom,
+    term=term,
+    session=session
+    ).select_related('studentclass', 'term', 'session')
     
     if not psychoList:
         # select Distinct students from result table
-        studentsResultList = Result.objects.filter(studentclass=classroom.pk,session=session.pk,term=term.pk).distinct('student')
-
+        # studentsResultList = Result.objects.filter(studentclass=classroom.pk,session=session.pk,term=term.pk).distinct('student')
+        studentsResultList = Result.objects.filter(
+        studentclass=classroom.pk,
+        session=session.pk,
+        term=term.pk
+        ).select_related('studentclass', 'session', 'term').distinct('student')
         # Get class teacher
   
         for student in studentsResultList:
@@ -272,12 +281,23 @@ def processPsycho(classroom,session,term):
 def processAffective(classroom,session,term):
     
     # list affetive items
-    affective = Studentaffective.objects.filter(studentclass=classroom.pk,term=term.pk,session=session.pk)
+    # affective = Studentaffective.objects.filter(studentclass=classroom.pk,term=term.pk,session=session.pk)
+    affective = Studentaffective.objects.filter(
+    studentclass=classroom.pk,
+    term=term.pk,
+    session=session.pk
+    ).select_related('studentclass', 'term', 'session')
     
     if not affective:
         
         # select Distinct students from result table
-        studentsResultList = Result.objects.filter(studentclass=classroom,session=session,term=term).distinct('student')
+        # studentsResultList = Result.objects.filter(studentclass=classroom,session=session,term=term).distinct('student')
+        
+        studentsResultList = Result.objects.filter(
+        studentclass=classroom,
+        session=session,
+        term=term
+        ).select_related('student', 'studentclass', 'session', 'term').distinct('student')
 
     
         for student in studentsResultList:
