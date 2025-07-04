@@ -637,25 +637,33 @@ class FindScoresAPIView(APIView):
 # get scores based on term, session and class
 class FilterTerminalScoresAPIView(APIView):
     def get(self, request):
-        
         payload = request.query_params
         print(payload)
         myterm = payload.get('term')
         mysession = payload.get('session')
-        myclass= payload.get('classroom')
-        
-        # subjObj = Subject.objects.get(pk=payload.get('subject'))
+        myclass = payload.get('classroom')
+
         classObj = SchoolClass.objects.get(pk=myclass)
         termObj = Term.objects.get(pk=myterm)
         sessionObj = Session.objects.get(pk=mysession)
-        
 
-        # Example usage: filtering queryset based on payload parameters
-        queryset = Scores.objects.filter(studentclass=classObj,session=sessionObj,term=termObj)
-        if not queryset:
+        # Use select_related to optimize foreign key lookups
+        queryset = Scores.objects.select_related(
+            'user',
+            'term',
+            'session',
+            'studentclass',
+            'subject',
+            'subjectteacher'
+        ).filter(
+            studentclass=classObj,
+            session=sessionObj,
+            term=termObj
+        )
+
+        if not queryset.exists():
             raise ValidationError("No records matching your criteria")
-        
-        # Serialize the data and return the response
+
         serializer = ScoresSerializer(queryset, many=True)
         return Response(serializer.data)
         
