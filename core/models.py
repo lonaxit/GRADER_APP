@@ -173,7 +173,13 @@ class Result(models.Model):
     date_modified = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.student.sur_name
-    
+
+    def admission_numberstring(self):
+        # Use select_related in queryset to avoid N+1 queries
+        if hasattr(self.student, 'studentprofile'):
+            return self.student.studentprofile.admission_numberstring
+        return None
+
 class AnnualResult(models.Model):
     
     student = models.ForeignKey(User,on_delete=models.CASCADE)
