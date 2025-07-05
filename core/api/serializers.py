@@ -170,12 +170,12 @@ class ScoreSerializer(serializers.ModelSerializer):
 
 class ScoresSerializer(serializers.ModelSerializer):
     # Use model property methods for these fields
-    student_full_name = serializers.CharField(source='student_full_name', read_only=True)
-    term_code = serializers.CharField(source='term_code', read_only=True)
-    session_name = serializers.CharField(source='session_name', read_only=True)
-    subject_code = serializers.CharField(source='subject_code', read_only=True)
-    class_name = serializers.CharField(source='class_name', read_only=True)
-    subject_teacher_name = serializers.CharField(source='subject_teacher_name', read_only=True)
+    student_full_name = serializers.CharField(read_only=True)
+    term_code = serializers.CharField(read_only=True)
+    session_name = serializers.CharField(read_only=True)
+    subject_code = serializers.CharField(read_only=True)
+    class_name = serializers.CharField(read_only=True)
+    subject_teacher_name = serializers.CharField(read_only=True)
     user_id = serializers.IntegerField(read_only=True)
 
     # Optionally, keep the nested serializers if you want full related objects
