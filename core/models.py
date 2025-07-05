@@ -200,14 +200,41 @@ class Result(models.Model):
     attendance = models.CharField(max_length=20,null=True,blank=True)
     date_created = models.DateTimeField(auto_now_add=True,null=True)
     date_modified = models.DateTimeField(auto_now=True)
+
     def __str__(self):
         return self.student.sur_name
 
+    @property
     def admission_numberstring(self):
-        # Use select_related in queryset to avoid N+1 queries
         if hasattr(self.student, 'studentprofile'):
             return self.student.studentprofile.admission_numberstring
         return None
+
+    @property
+    def student_full_name(self):
+        return f"{self.student.sur_name} {self.student.first_name}"
+
+    @property
+    def term_code(self):
+        return self.term.code if self.term else None
+
+    @property
+    def session_name(self):
+        return self.session.name if self.session else None
+
+    @property
+    def class_name(self):
+        return self.studentclass.class_name if self.studentclass else None
+
+    @property
+    def classteacher_name(self):
+        if self.classteacher and self.classteacher.tutor:
+            return f"{self.classteacher.tutor.sur_name} {self.classteacher.tutor.first_name}"
+        return None
+
+    @property
+    def user_id(self):
+        return self.student.id if self.student else None
 
 class AnnualResult(models.Model):
     

@@ -202,56 +202,35 @@ class ScoresSerializer(serializers.ModelSerializer):
   
 
 class ResultSerializer(serializers.ModelSerializer):
-    student = UserSerializer(read_only=True)  # Nested serializer for User
-    term = TermSerializer(read_only=True)  # Nested serializer for Term
-    session = SessionSerializer(read_only=True)  # Nested serializer for Session
-    studentclass = SchoolClassSerializer(read_only=True)  # Nested serializer for SchoolClass
-    classteacher = ClassTeacherSerializer(read_only=True)  # Nested serializer for Subject
-    
-    
-    # subjectteacher = SubjectTeacherSerializer(read_only=True)
-    # student_name = serializers.SerializerMethodField()
-    # classteacher_name = serializers.SerializerMethodField()
-    # session_name = serializers.SerializerMethodField()
-    # class_name = serializers.SerializerMethodField()
-    # term_name = serializers.SerializerMethodField()
+    # Use model property methods for these fields
+    student_full_name = serializers.CharField(source='student_full_name', read_only=True)
+    term_code = serializers.CharField(source='term_code', read_only=True)
+    session_name = serializers.CharField(source='session_name', read_only=True)
+    class_name = serializers.CharField(source='class_name', read_only=True)
+    classteacher_name = serializers.CharField(source='classteacher_name', read_only=True)
+    user_id = serializers.IntegerField(source='user_id', read_only=True)
     admission_number = serializers.CharField(source='admission_numberstring', read_only=True)
-    # user_id = serializers.SerializerMethodField()
-    
+
+    # Optionally, keep the nested serializers if you want full related objects
+    # student = UserSerializer(read_only=True)
+    # term = TermSerializer(read_only=True)
+    # session = SessionSerializer(read_only=True)
+    # studentclass = SchoolClassSerializer(read_only=True)
+    # classteacher = ClassTeacherSerializer(read_only=True)
+
     class Meta:
         model = Result
-        # exclude = ('date_created','date_modified',)
-        fields= "__all__"
-    
-    # def get_student_name(self,object):
-               
-    #     studentObj = User.objects.get(pk=object.student.pk)
-    #     return studentObj.sur_name + ' ' + studentObj.first_name
-    
-    # def get_classteacher_name(self,object):
-               
-    #     teacherObj = User.objects.get(pk=object.classteacher.tutor.pk)
-    #     return teacherObj.sur_name
-    
-    # def get_session_name(self,object):
-               
-    #     session = Session.objects.get(pk=object.session.pk)
-    #     return session.code
-    
-    # def get_term_name(self,object):
-               
-    #     term =  Term.objects.get(pk=object.term.pk)
-    #     return term.code
-    
-    # def get_class_name(self,object):
-               
-    #     _class = SchoolClass.objects.get(pk=object.studentclass.pk)
-    #     return _class.code
-    
-    # def get_user_id(self,object):
-               
-    #     _userobj = User.objects.get(pk=object.student.pk)
-    #     return _userobj.pk
+        fields = (
+            'id', 'student', 'user_id', 'student_full_name',
+            'term', 'term_code',
+            'session', 'session_name',
+            'studentclass', 'class_name',
+            'classteacher', 'classteacher_name',
+            'admission_number',
+            'termtotal', 'termaverage', 'termposition',
+            'classteachercomment', 'headteachercomment', 'attendance',
+            'date_created', 'date_modified',
+        )
 
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
