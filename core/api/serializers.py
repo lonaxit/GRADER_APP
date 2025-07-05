@@ -176,7 +176,7 @@ class ScoresSerializer(serializers.ModelSerializer):
     subject_code = serializers.CharField(source='subject_code', read_only=True)
     class_name = serializers.CharField(source='class_name', read_only=True)
     subject_teacher_name = serializers.CharField(source='subject_teacher_name', read_only=True)
-    user_id = serializers.IntegerField(source='user_id', read_only=True)
+    user_id = serializers.IntegerField(read_only=True)
 
     # Optionally, keep the nested serializers if you want full related objects
     # user = UserSerializer(read_only=True)
