@@ -155,7 +155,36 @@ class Scores(models.Model):
     def __str__(self):
         return self.user.sur_name
 
+    @property
+    def student_full_name(self):
+        return f"{self.user.sur_name} {self.user.first_name}"
 
+    @property
+    def term_code(self):
+        return self.term.code if self.term else None
+
+    @property
+    def session_name(self):
+        return self.session.name if self.session else None
+
+    @property
+    def subject_code(self):
+        return self.subject.subject_code if self.subject else None
+
+    @property
+    def class_name(self):
+        return self.studentclass.class_name if self.studentclass else None
+
+    @property
+    def subject_teacher_name(self):
+        # Assumes subjectteacher.teacher is a User instance
+        if self.subjectteacher and self.subjectteacher.teacher:
+            return f"{self.subjectteacher.teacher.sur_name} {self.subjectteacher.teacher.first_name}"
+        return None
+
+    @property
+    def user_id(self):
+        return self.user.id if self.user else None
 
 class Result(models.Model):
     student = models.ForeignKey(User,on_delete=models.CASCADE)

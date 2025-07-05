@@ -169,21 +169,36 @@ class ScoreSerializer(serializers.ModelSerializer):
 
 
 class ScoresSerializer(serializers.ModelSerializer):
-    # new
-    user = UserSerializer(read_only=True)  # Nested serializer for User
-    term = TermSerializer(read_only=True)  # Nested serializer for Term
-    session = SessionSerializer(read_only=True)  # Nested serializer for Session
-    studentclass = SchoolClassSerializer(read_only=True)  # Nested serializer for SchoolClass
-    subject = SubjectSerializer(read_only=True)  # Nested serializer for Subject
-    subjectteacher = SubjectTeacherSerializer(read_only=True)  # Nested serializer for SubjectTeacher
-    
+    # Use model property methods for these fields
+    student_full_name = serializers.CharField(source='student_full_name', read_only=True)
+    term_code = serializers.CharField(source='term_code', read_only=True)
+    session_name = serializers.CharField(source='session_name', read_only=True)
+    subject_code = serializers.CharField(source='subject_code', read_only=True)
+    class_name = serializers.CharField(source='class_name', read_only=True)
+    subject_teacher_name = serializers.CharField(source='subject_teacher_name', read_only=True)
+    user_id = serializers.IntegerField(source='user_id', read_only=True)
+
+    # Optionally, keep the nested serializers if you want full related objects
+    # user = UserSerializer(read_only=True)
+    # term = TermSerializer(read_only=True)
+    # session = SessionSerializer(read_only=True)
+    # studentclass = SchoolClassSerializer(read_only=True)
+    # subject = SubjectSerializer(read_only=True)
+    # subjectteacher = SubjectTeacherSerializer(read_only=True)
 
     class Meta:
         model = Scores
-        fields = ('id', 'user', 'term', 'session', 'studentclass', 'subject', 'subjectteacher',
+        fields = (
+            'id', 'user', 'user_id', 'student_full_name',
+            'term', 'term_code',
+            'session', 'session_name',
+            'studentclass', 'class_name',
+            'subject', 'subject_code',
+            'subjectteacher', 'subject_teacher_name',
             'firstscore', 'secondscore', 'thirdscore', 'totalca', 'examscore', 'subjecttotal',
             'subjaverage', 'subjectposition', 'subjectgrade', 'subjectrating', 'highest_inclass',
-            'lowest_inclass',)
+            'lowest_inclass',
+        )
   
 
 class ResultSerializer(serializers.ModelSerializer):
