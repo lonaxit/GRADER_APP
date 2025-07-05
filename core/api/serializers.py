@@ -203,12 +203,12 @@ class ScoresSerializer(serializers.ModelSerializer):
 
 class ResultSerializer(serializers.ModelSerializer):
     # Use model property methods for these fields
-    student_full_name = serializers.CharField(source='student_full_name', read_only=True)
-    term_code = serializers.CharField(source='term_code', read_only=True)
-    session_name = serializers.CharField(source='session_name', read_only=True)
-    class_name = serializers.CharField(source='class_name', read_only=True)
-    classteacher_name = serializers.CharField(source='classteacher_name', read_only=True)
-    user_id = serializers.IntegerField(source='user_id', read_only=True)
+    student_full_name = serializers.CharField(read_only=True)
+    term_code = serializers.CharField(read_only=True)
+    session_name = serializers.CharField(read_only=True)
+    class_name = serializers.CharField(read_only=True)
+    classteacher_name = serializers.CharField(read_only=True)
+    user_id = serializers.IntegerField(read_only=True)
     admission_number = serializers.CharField(source='admission_numberstring', read_only=True)
 
     # Optionally, keep the nested serializers if you want full related objects
