@@ -638,7 +638,7 @@ class FindScoresAPIView(APIView):
 class FilterTerminalScoresAPIView(APIView):
     def get(self, request):
         payload = request.query_params
-        print(payload)
+     
         myterm = payload.get('term')
         mysession = payload.get('session')
         myclass = payload.get('classroom')
@@ -648,6 +648,7 @@ class FilterTerminalScoresAPIView(APIView):
         sessionObj = Session.objects.get(pk=mysession)
 
         # Use select_related to optimize foreign key lookups
+        # Use only() to select specific fields
         queryset = Scores.objects.select_related(
             'user',
             'term',
@@ -655,6 +656,14 @@ class FilterTerminalScoresAPIView(APIView):
             'studentclass',
             'subject',
             'subjectteacher'
+        ).only(
+            'id',
+            'user__id',
+            'user__sur_name',
+            'user__first_name',
+            'subjecttotal',
+            'subjectposition',
+            'subjectgrade'
         ).filter(
             studentclass=classObj,
             session=sessionObj,
@@ -664,7 +673,7 @@ class FilterTerminalScoresAPIView(APIView):
         if not queryset.exists():
             raise ValidationError("No records matching your criteria")
 
-        serializer = ScoresSerializer(queryset, many=True)
+        serializer = TerminalScoresSummarySerializer(queryset, many=True)
         return Response(serializer.data)
         
 
