@@ -235,12 +235,17 @@ class ResultSerializer(serializers.ModelSerializer):
 class TerminalSummaryResultSerializer(serializers.ModelSerializer):
     # Use model property methods for these fields
     student_full_name = serializers.CharField(read_only=True)
+    term_code = serializers.CharField(read_only=True)
+    session_name = serializers.CharField(read_only=True)
+    class_name = serializers.CharField(read_only=True)
+    classteacher_name = serializers.CharField(read_only=True)
     user_id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Result
         fields = (
-            'user_id', 'student_full_name', 'termtotal', 'termaverage', 'termposition'
+            'user_id', 'student_full_name', 'term_code', 'session_name', 
+            'class_name', 'classteacher_name', 'termtotal', 'termaverage', 'termposition'
         )
 
 

@@ -1109,15 +1109,24 @@ class GetResult(generics.ListAPIView):
         termObj = get_object_or_404(Term, pk=payload.get('term'))
         sessionObj = get_object_or_404(Session, pk=payload.get('session'))
         
-        # Use select_related to optimize foreign key lookups
+        # Use select_related for all needed relationships
         # Use only() to select specific fields
         queryset = Result.objects.select_related(
-            'student'
+            'student',
+            'term',
+            'session',
+            'studentclass',
+            'classteacher__tutor'
         ).only(
             'id',
             'student__id',
             'student__sur_name',
             'student__first_name',
+            'term__code',
+            'session__name',
+            'studentclass__class_name',
+            'classteacher__tutor__sur_name',
+            'classteacher__tutor__first_name',
             'termtotal',
             'termaverage',
             'termposition'
