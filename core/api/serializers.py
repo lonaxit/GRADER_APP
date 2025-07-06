@@ -232,6 +232,18 @@ class ResultSerializer(serializers.ModelSerializer):
             'date_created', 'date_modified',
         )
 
+class TerminalSummaryResultSerializer(serializers.ModelSerializer):
+    # Use model property methods for these fields
+    student_full_name = serializers.CharField(read_only=True)
+    user_id = serializers.IntegerField(read_only=True)
+
+    class Meta:
+        model = Result
+        fields = (
+            'user_id', 'student_full_name', 'termtotal', 'termaverage', 'termposition'
+        )
+
+
 class RatingSerializer(serializers.ModelSerializer):
     class Meta:
         model = Rating

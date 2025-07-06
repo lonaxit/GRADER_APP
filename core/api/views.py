@@ -1104,34 +1104,33 @@ class ImportAssessment(generics.CreateAPIView):
 
 # List all result based on term, class, session
 class GetResult(generics.ListAPIView):
-    serializer_class = ResultSerializer
+    serializer_class = TerminalSummaryResultSerializer
     # permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
     
     def get_queryset(self):
-        # _class = self.request.data.get('classroom')
-        # _session = self.request.data.get('session')
-        # _term = self.request.data.get('term')
         payload = self.request.query_params
         
-        # myclass = payload.get('classroom')
-        # classObj = SchoolClass.objects.get(pk=myclass)
-        # termObj = Term.objects.get(pk=payload.get('term'))
-        # sessionObj = Session.objects.get(pk=payload.get('session'))
-       
         classObj = get_object_or_404(SchoolClass, pk=payload.get('classroom'))
         termObj = get_object_or_404(Term, pk=payload.get('term'))
         sessionObj = get_object_or_404(Session, pk=payload.get('session'))
         
-    
-        
-        # Example: Fetching data based on a filter field named 'filter_field'
+        # Use select_related to optimize foreign key lookups
+        # Use only() to select specific fields
         queryset = Result.objects.select_related(
-            'student',
-            'term',
-            'session',
-            'studentclass',
-            'classteacher',
-        ).filter(studentclass=classObj,session=sessionObj,term=termObj)
+            'student'
+        ).only(
+            'id',
+            'student__id',
+            'student__sur_name',
+            'student__first_name',
+            'termtotal',
+            'termaverage',
+            'termposition'
+        ).filter(
+            studentclass=classObj,
+            session=sessionObj,
+            term=termObj
+        )
         
         if not queryset.exists():
             raise ValidationError("No records matching your criteria")
