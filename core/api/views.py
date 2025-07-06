@@ -647,15 +647,17 @@ class FilterTerminalScoresAPIView(APIView):
         termObj = Term.objects.get(pk=myterm)
         sessionObj = Session.objects.get(pk=mysession)
 
-        # Use select_related only for the user relationship
+        # Use select_related for all needed relationships
         # Use only() to select specific fields
         queryset = Scores.objects.select_related(
-            'user'
+            'user',
+            'subject'
         ).only(
             'id',
             'user__id',
             'user__sur_name',
             'user__first_name',
+            'subject__subject_code',
             'subjecttotal',
             'subjectposition',
             'subjectgrade'

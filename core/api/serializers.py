@@ -314,10 +314,11 @@ class AdmissionNumberSerializer(serializers.ModelSerializer):
 class TerminalScoresSummarySerializer(serializers.ModelSerializer):
     # Use model property methods for these fields
     student_full_name = serializers.CharField(read_only=True)
+    subject_code = serializers.CharField(read_only=True)
     user_id = serializers.IntegerField(read_only=True)
 
     class Meta:
         model = Scores
         fields = (
-            'user_id', 'student_full_name', 'subjecttotal', 'subjectposition', 'subjectgrade'
+            'user_id', 'student_full_name', 'subject_code', 'subjecttotal', 'subjectposition', 'subjectgrade'
         )
