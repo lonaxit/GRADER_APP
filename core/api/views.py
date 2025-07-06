@@ -647,15 +647,10 @@ class FilterTerminalScoresAPIView(APIView):
         termObj = Term.objects.get(pk=myterm)
         sessionObj = Session.objects.get(pk=mysession)
 
-        # Use select_related to optimize foreign key lookups
+        # Use select_related only for the user relationship
         # Use only() to select specific fields
         queryset = Scores.objects.select_related(
-            'user',
-            'term',
-            'session',
-            'studentclass',
-            'subject',
-            'subjectteacher'
+            'user'
         ).only(
             'id',
             'user__id',
