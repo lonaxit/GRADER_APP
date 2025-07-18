@@ -312,7 +312,16 @@ class Classroom(models.Model):
     date_modified = models.DateTimeField(auto_now=True)
     def __str__(self):
         return self.class_room
-    
+
+    @property
+    def student_name(self):
+        return f"{self.student.sur_name} {self.student.first_name}"
+
+    @property
+    def student_adm_no(self):
+        if hasattr(self.student, 'studentprofile'):
+            return self.student.studentprofile.admission_numberstring
+        return None
 
 # Admission number list
 class AdmissionNumber(models.Model):

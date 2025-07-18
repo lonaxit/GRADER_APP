@@ -1490,58 +1490,75 @@ class EnrollStudent(generics.CreateAPIView):
 class MassEnrollStudent(generics.CreateAPIView):
     serializer_class = ClassroomSerializer
     # permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
-    
+
     def get_queryset(self):
-        # just return the review object
         return Classroom.objects.all()
-    
+
     def post(self, request, *args, **kwargs):
-        
-        
         with transaction.atomic():
-            
             try:
-                
                 from_class = request.data.get('oldclass')
                 from_term = request.data.get('oldterm')
                 from_session = request.data.get('oldsession')
-                
+
                 to_class = request.data.get('nextclassroom')
                 to_term = request.data.get('nextterm')
                 to_session = request.data.get('nextsession')
-                
-               
-                
-                
-                studentEnrolled = Classroom.objects.filter(Q(term=from_term) & Q(session=from_session) & Q (class_room=from_class)).distinct('student')
-                
-                if not studentEnrolled:
+
+                # Get unique student IDs enrolled in the old class/term/session
+                student_ids = (
+                    Classroom.objects
+                    .filter(term=from_term, session=from_session, class_room=from_class)
+                    .values_list('student', flat=True)
+                    .distinct()
+                )
+
+                if not student_ids:
                     raise ValidationError("No records available for your selection")
-                
-                else:
-                
-                    for row in studentEnrolled:
-                        # check for students duplicate in class
-                        stud_obj = Classroom.objects.filter(student=row.student.pk,class_room=to_class,session=to_session,term=to_term)
-                        if stud_obj:
-                            continue
-                            
-                        enrollObj = Classroom.objects.create(
-                            class_room=SchoolClass.objects.get(pk=to_class),
-                            session = Session.objects.get(pk=to_session),
-                            term = Term.objects.get(pk=to_term),
-                            student = User.objects.get(pk=row.student.pk)
-                        )
-                        enrollObj.save()
-  
+
+                # Use select_related to fetch related objects in one query (if needed)
+                students = User.objects.filter(id__in=student_ids)
+
+                # Fetch related objects for the new enrollment in advance
+                class_obj = SchoolClass.objects.get(pk=to_class)
+                session_obj = Session.objects.get(pk=to_session)
+                term_obj = Term.objects.get(pk=to_term)
+
+                # Find already enrolled students in the new class/term/session
+                already_enrolled_ids = set(
+                    Classroom.objects
+                    .filter(
+                        class_room=to_class,
+                        session=to_session,
+                        term=to_term,
+                        student__in=student_ids
+                    )
+                    .values_list('student', flat=True)
+                )
+
+                # Prepare Classroom objects for bulk creation
+                new_enrollments = [
+                    Classroom(
+                        class_room=class_obj,
+                        session=session_obj,
+                        term=term_obj,
+                        student=student
+                    )
+                    for student in students
+                    if student.id not in already_enrolled_ids
+                ]
+
+                if new_enrollments:
+                    Classroom.objects.bulk_create(new_enrollments)
+
             except Exception as e:
                 raise ValidationError(e)
-           
+
         return Response(
-                {'msg':'Enrollment created successfully'},
-                status = status.HTTP_201_CREATED
-                )
-        
+            {'msg': 'Enrollment created successfully'},
+            status=status.HTTP_201_CREATED
+        )
+
 # # List all student in classroom based on term, class, session
 # class RollCall(generics.ListAPIView):
 #     serializer_class = ClassroomSerializer

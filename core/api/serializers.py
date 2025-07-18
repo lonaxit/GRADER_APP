@@ -286,8 +286,8 @@ class StudentpsychomotorSerializer(serializers.ModelSerializer):
 
 
 class ClassroomSerializer(serializers.ModelSerializer):
-    student_name = serializers.SerializerMethodField()
-    student_adm_no = serializers.SerializerMethodField()
+    student_name = serializers.CharField(read_only=True)
+    student_adm_no = serializers.CharField(read_only=True)
     session = serializers.StringRelatedField()
     term = serializers.StringRelatedField()
     class_room = serializers.StringRelatedField()
@@ -295,15 +295,8 @@ class ClassroomSerializer(serializers.ModelSerializer):
     class Meta:
         model = Classroom
         fields = "__all__"
-    
-    def get_student_name(self,object):
-        user = User.objects.get(pk=object.student.pk)
-        return user.sur_name + ' ' + user.first_name
-    
-    def get_student_adm_no(self,object):
-        obj = StudentProfile.objects.get(user_id=object.student.pk)
-        return obj.admission_numberstring
-    
+
+
 # admission number serialiser
 class AdmissionNumberSerializer(serializers.ModelSerializer):
 
