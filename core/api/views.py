@@ -342,11 +342,14 @@ class TeacherProfileDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     
 
 class SubjectTeacherListAPIView(generics.ListAPIView):
-    queryset = SubjectTeacher.objects.all()
     serializer_class = SubjectTeacherSerializer
-    # permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
-    
-    
+
+    def get_queryset(self):
+        return SubjectTeacher.objects.select_related(
+            'subject', 'classroom', 'session', 'teacher'
+        ).all()
+
+
 # create a subject teacher given a userid
 class SubjectTeacherCreateAPIView(generics.CreateAPIView):
     
