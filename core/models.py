@@ -129,6 +129,22 @@ class ClassTeacher(models.Model):
     
     def __str__(self):
         return self.tutor.sur_name
+
+    @property
+    def session_name(self):
+        return self.session.name if self.session else None
+
+    @property
+    def term_name(self):
+        return self.term.name if self.term else None
+
+    @property
+    def classroom_name(self):
+        return self.classroom.class_name if self.classroom else None
+
+    @property
+    def tutor_name(self):
+        return f"{self.tutor.sur_name} {self.tutor.first_name}" if self.tutor else None
     
     
 class Scores(models.Model):

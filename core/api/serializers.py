@@ -127,36 +127,15 @@ class ResumptionSettingSerializer(serializers.ModelSerializer):
 
 # class teacher serializer
 class ClassTeacherSerializer(serializers.ModelSerializer):
-    tutor = UserSerializer(read_only=True)
-    # tutor = serializers.StringRelatedField(read_only=True)
-    # teacher_name = serializers.SerializerMethodField()
-    # session_name = serializers.SerializerMethodField()
-    # class_name = serializers.SerializerMethodField()
-    # term_name = serializers.SerializerMethodField()
+    tutor = serializers.StringRelatedField(read_only=True)
+    tutor_name = serializers.CharField(read_only=True)
+    session_name = serializers.CharField(read_only=True)
+    class_name = serializers.CharField(source='classroom_name', read_only=True)
+    term_name = serializers.CharField(read_only=True)
 
     class Meta:
         model = ClassTeacher
         exclude = ('date_created','date_modified',)
-    
-    # def get_teacher_name(self,object):
-               
-    #     teacherObj = User.objects.get(pk=object.tutor.pk)
-    #     return teacherObj.sur_name + ' ' + teacherObj.first_name
-    
-    # def get_session_name(self,object):
-               
-    #     session = Session.objects.get(pk=object.session.pk)
-    #     return session.name
-    
-    # def get_term_name(self,object):
-               
-    #     term = Term.objects.get(pk=object.term.pk)
-    #     return term.name
-    
-    # def get_class_name(self,object):
-               
-    #     _class = SchoolClass.objects.get(pk=object.classroom.pk)
-    #     return _class.class_name
     
 #score
 class ScoreSerializer(serializers.ModelSerializer):
