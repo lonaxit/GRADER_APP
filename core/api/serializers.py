@@ -26,9 +26,11 @@ class TermSerializer(serializers.ModelSerializer):
 
 # subject teacher serializer
 class SubjectTeacherSerializer(serializers.ModelSerializer):  
-    # 
-    teacher = UserSerializer(read_only=True)
-
+    # Use model properties for these fields:
+    subject = serializers.CharField(source='subject_name', read_only=True)
+    classroom = serializers.CharField(source='classroom_name', read_only=True)
+    session = serializers.CharField(source='session_name', read_only=True)
+    teacher = serializers.CharField(source='teacher_name', read_only=True)
 
     class Meta:
         model = SubjectTeacher

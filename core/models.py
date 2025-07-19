@@ -116,7 +116,23 @@ class SubjectTeacher(models.Model):
     
     def __str__(self):
         return self.teacher.sur_name
-   
+
+    @property
+    def subject_name(self):
+        return self.subject.name if self.subject else None
+
+    @property
+    def classroom_name(self):
+        return self.classroom.class_name if self.classroom else None
+
+    @property
+    def session_name(self):
+        return self.session.name if self.session else None
+
+    @property
+    def teacher_name(self):
+        return f"{self.teacher.sur_name} {self.teacher.first_name}" if self.teacher else None
+
 # assign class teacher
 class ClassTeacher(models.Model):
     session = models.ForeignKey(Session,on_delete=models.DO_NOTHING)
