@@ -158,6 +158,7 @@ class ScoresSerializer(serializers.ModelSerializer):
     class_name = serializers.CharField(read_only=True)
     subject_teacher_name = serializers.CharField(read_only=True)
     user_id = serializers.IntegerField(read_only=True)
+    subject_name = serializers.CharField(source='subject.name', read_only=True)
 
     # Optionally, keep the nested serializers if you want full related objects
     # user = UserSerializer(read_only=True)
@@ -174,7 +175,7 @@ class ScoresSerializer(serializers.ModelSerializer):
             'term', 'term_code',
             'session', 'session_name',
             'studentclass', 'class_name',
-            'subject', 'subject_code',
+            'subject', 'subject_code', 'subject_name',
             'subjectteacher', 'subject_teacher_name',
             'firstscore', 'secondscore', 'thirdscore', 'totalca', 'examscore', 'subjecttotal',
             'subjaverage', 'subjectposition', 'subjectgrade', 'subjectrating', 'highest_inclass',
