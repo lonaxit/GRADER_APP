@@ -780,44 +780,30 @@ class CreateResult(generics.CreateAPIView):
         with transaction.atomic():
             
             try:
-                # Access form values from the request object
                 _class = request.data.get('studentclass')
                 term = request.data.get('term')
                 session = request.data.get('session')
-                
+
                 classObj = SchoolClass.objects.get(pk=_class)
                 termObj = Term.objects.get(pk=term)
                 sessionObj = Session.objects.get(pk=session)
-                
+
                 loggedInUser = request.user
-                
-                _isteacher = ClassTeacher.objects.filter(tutor=loggedInUser,classroom=classObj)
-                if not _isteacher:
+
+                _isteacher = ClassTeacher.objects.filter(tutor=loggedInUser, classroom=classObj, session=sessionObj)
+                if not _isteacher.exists():
                     raise ValidationError("You are not a class teacher for this class")
-                
-                
-                # process terminal result
-                processTerminalResult(request,classObj,termObj,sessionObj)
 
-                    # process terminal result
-                    # processAnnualResult(score)
+                # Optimized: process terminal result in bulk
+                processTerminalResult(classObj, termObj, sessionObj, _isteacher.first())
 
-                    # Add auto comment
-                    # autoAddComment(score.studentclass,score.session,score.term)
-
-                    # proccess Affective domain
-                    # processAffective(score)
-
-                    # process Psychomotor domain
-                    # processPsycho(score)
-                
             except Exception as e:
                 raise ValidationError(e)
-           
+
         return Response(
-                {'msg':'Result created successfully'},
-                status = status.HTTP_201_CREATED
-                )
+            {'msg': 'Result created successfully'},
+            status=status.HTTP_201_CREATED
+        )
     
 # List all result based on term, class, session
 # class ExportSheet(APIView):

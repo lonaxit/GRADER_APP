@@ -1,4 +1,3 @@
-
 import random
 import string
 
@@ -9,7 +8,7 @@ from core.api.permissions import *
 from core.models import *
 from django.contrib.auth import get_user_model
 # from django.db.models import Q, Sum, Avg, Max, Min
-from django.db import transaction
+from django.db import transaction, models
 from django.shortcuts import get_object_or_404
 # # from rest_framework import mixins
 from rest_framework import generics, status
@@ -30,57 +29,51 @@ import openpyxl
 User = get_user_model()
 
 
-def processTerminalResult(request,classObj,termObj,sessionObj):
-    
-    # find class teacher
-    # class_teacher = ClassTeacher.objects.get(session=sessionObj.pk,term=termObj.pk,classroom=classObj)
-    
-    _isteacher = ClassTeacher.objects.get(tutor=request.user,classroom=classObj,session=sessionObj)
-    
-    # find distint students in the scores table
-    students = Scores.objects.filter(session=sessionObj,term=termObj,studentclass=classObj).distinct('user')
-    
-    
-    
-    # filter scores based on session, term and class
-    scoresList = Scores.objects.filter(studentclass=classObj,term=termObj,session=sessionObj)
-    
-    # # filter result based on session,class and term
-    result = Result.objects.filter(studentclass=classObj, term=termObj,session=sessionObj)
-    
-    
-    for student in students:
-        scores = scoresList.filter(user=student.user).aggregate(subject_total=Sum('subjecttotal'))
-        
+def processTerminalResult(classObj, termObj, sessionObj, classteacher):
+    # Get all students with scores in this class/term/session
+    students_scores = (
+        Scores.objects
+        .filter(session=sessionObj, term=termObj, studentclass=classObj)
+        .values('user')
+        .annotate(subject_total=Sum('subjecttotal'))
+    )
 
-        # check for existence of record
-        if result.filter(student=student.user).exists():
-            # update the record
-            result.filter(student=student.user).update(termtotal=scores['subject_total'])
-                  
+    # Get existing results for this class/term/session
+    existing_results = {
+        (r.student_id): r
+        for r in Result.objects.filter(studentclass=classObj, term=termObj, session=sessionObj)
+    }
+
+    results_to_update = []
+    results_to_create = []
+
+    for entry in students_scores:
+        student_id = entry['user']
+        total = entry['subject_total']
+        if student_id in existing_results:
+            result = existing_results[student_id]
+            result.termtotal = total
+            results_to_update.append(result)
         else:
-            
-            
-            # create a new record
-            resultObj = Result.objects.create(
-                                 termtotal = scores['subject_total'],
-                                 classteacher = _isteacher,
-                                 session = sessionObj,
-                                 studentclass = classObj,
-                                 term = termObj,
-                                 student = student.user
-                                     )
-            resultObj.save()
+            results_to_create.append(Result(
+                termtotal=total,
+                classteacher=classteacher,
+                session=sessionObj,
+                studentclass=classObj,
+                term=termObj,
+                student_id=student_id
+            ))
 
-        # update term average
-    # terminalAverage(scoresObj.student,scoresObj.studentclass,scoresObj.term.pk,   scoresObj.session.pk)
-    
-    # new code 
-    terminalAverage(classObj,termObj,sessionObj)
+    # Bulk update and create
+    if results_to_update:
+        Result.objects.bulk_update(results_to_update, ['termtotal'])
+    if results_to_create:
+        Result.objects.bulk_create(results_to_create, batch_size=1000)
 
-    # update  term position
-    terminalPosition(classObj,termObj,sessionObj)
- 
+    # Update averages and positions in bulk
+    terminalAverage(classObj, termObj, sessionObj)
+    terminalPosition(classObj, termObj, sessionObj)
+
 # 
 # find subject and class average
 def subjectAverage(subj,classroom,termObj,sessionObj):
@@ -326,89 +319,46 @@ def processAffective(classroom,session,term):
 
     
 
-def terminalAverage(classroom,term,session):
+def terminalAverage(classroom, term, session):
+    # Get number of subjects per class
+    try:
+        no_subj_per_class = SubjectPerClass.objects.get(sch_class=classroom, term=term, session=session).no_subject
+    except SubjectPerClass.DoesNotExist:
+        no_subj_per_class = 1  # Avoid division by zero
 
-    resultList = Result.objects.filter(studentclass=classroom,term=term,session=session)
-    # get subject per class
-    no_subj_per_class = SubjectPerClass.objects.get(sch_class=classroom,term=term,session=session)
-
-    for result in resultList:
-
-    # scores = Scores.objects.filter(student=studentid,studentclass=classroom,term=termObj,session=sessionObj).aggregate(term_sum=Sum('subjecttotal'))
-
-    # term_sum = scores['term_sum']
-    
-
-        class_av = result.termtotal/no_subj_per_class.no_subject
-
-        result = resultList.filter(student=result.student.pk).update(termaverage=class_av)
+    # Update all results in bulk
+    Result.objects.filter(studentclass=classroom, term=term, session=session).update(
+        termaverage=models.F('termtotal') / no_subj_per_class
+    )
 
 # assign terminal result position
-def terminalPosition(classroom,term,session):
+def terminalPosition(classroom, term, session):
+    # Get all results ordered by termtotal descending
+    results = Result.objects.filter(studentclass=classroom, term=term, session=session).order_by('-termtotal', 'student_id').values('id', 'termtotal')
 
-
-    results = Result.objects.filter(studentclass=classroom,term=term,session=session)
-    ordered_scores = []
-    counter = 1
+    # Assign positions (handle ties)
+    position = 1
     repeated_counter = 0
+    previous_score = None
+    positions = {}
 
-    previous_score = Result.objects.none()
-    for result in results.order_by("-termtotal"):
-        # repeated_counter = 0
-        if counter == 1:
-            # this is the first iteration, just assign the first position
-            position = counter
-             # update the database
-            result_entity = Result.objects.get(pk=result.pk)
-            result_entity.termposition = position
-            result_entity.save()
-
-
-            # ordered_scores.append({
-            # "position": position,
-            # "id": score.pk,
-            # "subjecttotal": score.subjecttotal
-            # })
-            previous_score = result
-            counter += 1
+    for idx, result in enumerate(results):
+        if previous_score is not None and result['termtotal'] == previous_score:
+            repeated_counter += 1
         else:
+            position = idx + 1
+            repeated_counter = 0
+        positions[result['id']] = position
+        previous_score = result['termtotal']
 
-            # check for duplicate
-            if result.termtotal == previous_score.termtotal:
-                # update database
-                result_entity = Result.objects.get(pk=result.pk)
-                result_entity.termposition = position
-                result_entity.save()
+    # Bulk update positions
+    if positions:
+        cases = [models.When(id=pk, then=models.Value(pos)) for pk, pos in positions.items()]
+        Result.objects.filter(id__in=positions.keys()).update(
+            termposition=models.Case(*cases, output_field=models.IntegerField())
+        )
 
-                # position = counter
-                # ordered_scores.append({
-                # "position": position,
-                # "id": score.pk,
-                # "subjecttotal": score.subjecttotal
-                # })
-                # position = previous_score.position
-                repeated_counter +=1
 
-            else:
-                position = counter + repeated_counter
-                # update database
-                result_entity = Result.objects.get(pk=result.pk)
-                result_entity.termposition = position
-                result_entity.save()
-
-                # ordered_scores.append({
-                # "position": position,
-                # "id": score.pk,
-                # "subjecttotal": score.subjecttotal
-                # })
-
-                previous_score = result
-                # previous_position = position
-                # repeated_counter = position
-                counter += 1
-                
-                
-                
 def autoAddComment(classroom,session,term):
 
     # select result
