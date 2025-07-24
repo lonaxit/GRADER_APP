@@ -729,28 +729,15 @@ class BuidScores(generics.CreateAPIView):
             try:
                 # Access form values from the request object
                 _class = request.data.get('studentclass')
-                # term = request.data.get('term')
-                # session = request.data.get('session')
                 subj = request.data.get('subj')
                 
                 classObj = SchoolClass.objects.get(pk=_class)
-                # termObj = Term.objects.get(pk=term)
-                # sessionObj = Session.objects.get(pk=session)
-                
-                
                 subjectObj = Subject.objects.get(pk=subj)   
                 activeTerm = Term.objects.get(status='True')
                 activeSession = Session.objects.get(status='True')
                 
-                # loggedInUser = request.user
-                
-                # _isteacher = ClassTeacher.objects.filter(tutor=loggedInUser,classroom=classObj)
-                # if not _isteacher:
-                #     raise ValidationError("You are not a class teacher for this class")
-                
-                
-                # process terminal scores
-                processScores(subjectObj,classObj,activeTerm,activeSession)
+                # Efficiently process all scores for this subject/class/term/session
+                processScores(subjectObj, classObj, activeTerm, activeSession)
 
             except Exception as e:
                 raise ValidationError(e)

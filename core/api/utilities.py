@@ -76,16 +76,11 @@ def processTerminalResult(classObj, termObj, sessionObj, classteacher):
 
 # 
 # find subject and class average
-def subjectAverage(subj,classroom,termObj,sessionObj):
-    
-    # get scores based on subject
-    # scores = Scores.objects.filter(subject=subj,studentclass=classroom,term=activeTerm,session=activeSession).distinct('student').aggregate(Sum('subjAverage'))
-
-    scores = Scores.objects.filter(subject=subj,studentclass=classroom,term=termObj,session=sessionObj).aggregate(scoresav=Avg('subjecttotal'))
-
-    av = scores['scoresav']
-
-    return av
+def subjectAverage(subj, classroom, termObj, sessionObj):
+    scores = Scores.objects.filter(
+        subject=subj, studentclass=classroom, term=termObj, session=sessionObj
+    ).aggregate(scoresav=Avg('subjecttotal'))
+    return scores['scoresav']
 
 #  subject positioning
 def subjectPosition(subject, classroom,termObj,sessionObj):
@@ -93,136 +88,105 @@ def subjectPosition(subject, classroom,termObj,sessionObj):
     # activeTerm = Term.objects.get(status='True')
     # activeSession = Session.objects.get(status='True')
 
-    scores = Scores.objects.filter(subject=subject,studentclass=classroom,term=termObj,session=sessionObj)
-    ordered_scores = []
-    counter = 1
+    # Get all scores ordered by subjecttotal descending
+    scores = list(
+        Scores.objects.filter(
+            subject=subject, studentclass=classroom, term=termObj, session=sessionObj
+        ).order_by('-subjecttotal', 'user_id').values('id', 'subjecttotal')
+    )
+
+    # Assign positions (handle ties)
+    position = 1
     repeated_counter = 0
-    # index_counter = 0
-    previous_score = Scores.objects.none()
-    for score in scores.order_by("-subjecttotal"):
-        # repeated_counter = 0
-        if counter == 1:
-            # this is the first iteration, just assign the first position
-            position = counter
-             # update the database
-            score_entity = Scores.objects.get(pk=score.pk)
-            score_entity.subjectposition = position
-            score_entity.save()
-            # ordered_scores.append({
-            # "position": position,
-            # "id": score.pk,
-            # "subjecttotal": score.subjecttotal
-            # })
-            previous_score = score
-            counter += 1
+    previous_score = None
+    positions = {}
 
+    for idx, score in enumerate(scores):
+        if previous_score is not None and score['subjecttotal'] == previous_score:
+            repeated_counter += 1
         else:
+            position = idx + 1
+            repeated_counter = 0
+        positions[score['id']] = position
+        previous_score = score['subjecttotal']
 
-            # check for duplicate
-            if score.subjecttotal == previous_score.subjecttotal:
-                # update database
-                score_entity = Scores.objects.get(pk=score.pk)
-                score_entity.subjectposition = position
-                score_entity.save()
-
-                # position = counter
-                # ordered_scores.append({
-                # "position": position,
-                # "id": score.pk,
-                # "subjecttotal": score.subjecttotal
-                # })
-                # position = previous_score.position
-                repeated_counter +=1
-
-            else:
-                position = counter + repeated_counter
-                # update database
-                score_entity = Scores.objects.get(pk=score.pk)
-                score_entity.subjectposition = position
-                score_entity.save()
-
-                # ordered_scores.append({
-                # "position": position,
-                # "id": score.pk,
-                # "subjecttotal": score.subjecttotal
-                # })
-
-                previous_score = score
-                # previous_position = position
-                # repeated_counter = position
-
-                counter += 1
-    # return render(request, "template.html", {"players": ordered_players})
-    # return ordered_scores
+    # Bulk update positions
+    if positions:
+        cases = [models.When(id=pk, then=models.Value(pos)) for pk, pos in positions.items()]
+        Scores.objects.filter(id__in=positions.keys()).update(
+            subjectposition=models.Case(*cases, output_field=models.IntegerField())
+        )
 
 
 # update ratings
-def scoresRating(subject,classroom,termObj,sessionObj):
+def scoresRating(subject, classroom, termObj, sessionObj):
 
     # activeTerm = Term.objects.get(status='True')
     # activeSession = Session.objects.get(status='True')
 
     
     # TODO: Use select for update because of transaction
-    scores = Scores.objects.filter(subject=subject,studentclass=classroom,term=termObj,session=sessionObj)
+    # Fetch all relevant scores
+    scores = Scores.objects.filter(
+        subject=subject, studentclass=classroom, term=termObj, session=sessionObj
+    )
 
-    for scoresObj in scores:
-
-        if scoresObj.subjecttotal <= 39:
-            scoresObj.subjectgrade = 'F'
-            scoresObj.subjectrating = 'Failed'
-            scoresObj.save()
-        elif scoresObj.subjecttotal >= 40 and scoresObj.subjecttotal <= 44.9:
-            scoresObj.subjectgrade = 'E'
-            scoresObj.subjectrating = 'Poor'
-            scoresObj.save()
-        elif scoresObj.subjecttotal >= 45 and scoresObj.subjecttotal <= 54.9:
-            scoresObj.subjectgrade = 'D'
-            scoresObj.subjectrating = 'Fair'
-            scoresObj.save()
-        elif scoresObj.subjecttotal >= 55 and scoresObj.subjecttotal <= 64.9:
-            scoresObj.subjectgrade = 'C'
-            scoresObj.subjectrating = 'Good'
-            scoresObj.save()
-        elif scoresObj.subjecttotal >= 65 and scoresObj.subjecttotal <= 74.9:
-            scoresObj.subjectgrade = 'B'
-            scoresObj.subjectrating = 'Very Good'
-            scoresObj.save()
-        elif scoresObj.subjecttotal >= 75 and scoresObj.subjecttotal <= 100:
-
-            scoresObj.subjectgrade = 'A'
-            scoresObj.subjectrating = 'Excellent'
-            scoresObj.save()
+    updates = []
+    for score in scores:
+        total = score.subjecttotal or 0
+        if total <= 39:
+            grade, rating = 'F', 'Failed'
+        elif 40 <= total <= 44.9:
+            grade, rating = 'E', 'Poor'
+        elif 45 <= total <= 54.9:
+            grade, rating = 'D', 'Fair'
+        elif 55 <= total <= 64.9:
+            grade, rating = 'C', 'Good'
+        elif 65 <= total <= 74.9:
+            grade, rating = 'B', 'Very Good'
+        elif 75 <= total <= 100:
+            grade, rating = 'A', 'Excellent'
         else:
-            scoresObj.subjectgrade = 'NA'
-            scoresObj.subjectrating = 'NA'
-            scoresObj.save()
+            grade, rating = 'NA', 'NA'
+        score.subjectgrade = grade
+        score.subjectrating = rating
+        updates.append(score)
+    if updates:
+        Scores.objects.bulk_update(updates, ['subjectgrade', 'subjectrating'])
 
 
 # Minimum and Maximum scores
-def minMaxScores(subject,classroom,termObj,sessionObj):
- 
-    min_max = Scores.objects.filter(subject=subject,studentclass=classroom,term=termObj,session=sessionObj).aggregate(min_scores=Min('subjecttotal'),max_scores=Max('subjecttotal'))
+def minMaxScores(subject, classroom, termObj, sessionObj):
+    min_max = Scores.objects.filter(
+        subject=subject, studentclass=classroom, term=termObj, session=sessionObj
+    ).aggregate(min_scores=Min('subjecttotal'), max_scores=Max('subjecttotal'))
 
-    scores = Scores.objects.filter(subject=subject,studentclass=classroom,term=termObj,session=sessionObj).update(highest_inclass=min_max['max_scores'],lowest_inclass=min_max['min_scores'])
+    Scores.objects.filter(
+        subject=subject, studentclass=classroom, term=termObj, session=sessionObj
+    ).update(
+        highest_inclass=min_max['max_scores'],
+        lowest_inclass=min_max['min_scores']
+    )
     
     
 #  process scores
-def processScores(subjectObj,classroomObj,termObj,sessionObj):
+def processScores(subjectObj, classroomObj, termObj, sessionObj):
    
 
-    subjavg = subjectAverage(subjectObj,classroomObj,termObj,sessionObj)
+    subjavg = subjectAverage(subjectObj, classroomObj, termObj, sessionObj)
 
-    scores = Scores.objects.filter(subject=subjectObj,studentclass=classroomObj,term=termObj,session=sessionObj).update(subjaverage=subjavg)
+    Scores.objects.filter(
+        subject=subjectObj, studentclass=classroomObj, term=termObj, session=sessionObj
+    ).update(subjaverage=subjavg)
 
     #update position and grading
-    subjectPosition(subjectObj,classroomObj,termObj,sessionObj)
+    subjectPosition(subjectObj, classroomObj, termObj, sessionObj)
 
     #Update  grades
-    scoresRating(subjectObj,classroomObj,termObj,sessionObj)
+    scoresRating(subjectObj, classroomObj, termObj, sessionObj)
 
     # update min and max
-    minMaxScores(subjectObj,classroomObj,termObj,sessionObj)
+    minMaxScores(subjectObj, classroomObj, termObj, sessionObj)
 
  
 #    
