@@ -1001,105 +1001,95 @@ class UploadTerminalAttendance(generics.CreateAPIView):
 class ImportAssessment(generics.CreateAPIView):
     serializer_class = ScoresSerializer
     parser_classes = (MultiPartParser, FormParser,)
-    # permission_classes = [IsAuthenticated & IsAuthOrReadOnly]
     permission_classes = [IsAuthenticated]
-    
-    # def get_queryset(self):
-        # just return the review object
-        # return Scores.objects.all()
-    
+
     def post(self, request, *args, **kwargs):
-        
         with transaction.atomic():
-              
             try:
-                 if 'file' not in request.FILES:
-                    
-                     raise ValidationError({"msg":"no file chosen"})
-                 else:
+                if 'file' not in request.FILES:
+                    raise ValidationError({"msg": "no file chosen"})
+                else:
                     data = request.FILES['file']
-                   
                     reader = pd.read_excel(data)
-                    # reader = reader.where(pd.notnull(reader), None)
                     dtframe = reader.fillna(0)
-                  
-                
-                    for dtframe in dtframe.itertuples():
-                        studentObj=User.objects.get(pk=dtframe.STDID)
-                        classObj = SchoolClass.objects.get(pk=dtframe.CLASSID) 
-                        subjectObj = Subject.objects.get(pk=dtframe.SUBJID)   
-                        activeTerm = Term.objects.get(status='True')
-                        activeSession = Session.objects.get(status='True')
-                     
-                    
-                        # check for subject teacher
-                        teacher = self.request.user
-                        
-                        # _isteacher = SubjectTeacher.objects.filter(teacher=teacher.pk,classroom=int(dtframe.CLASSID),session=activeSession.pk,subject=dtframe.SUBJID)
-                        
-                        # for use this term
-                        subjteacher = SubjectTeacher.objects.filter(classroom=dtframe.CLASSID,session=activeSession.pk,subject=dtframe.SUBJID).first()
-                        
-                        # if not _isteacher:
-                        #     raise ValidationError("You are not a subject teacher for this class")
-                        # else:
-                            # check if studentexist in class
-                        isEnrolled = Classroom.objects.filter(session=activeSession,term=activeTerm,class_room = classObj,student=dtframe.STDID).exists()
-                        if  not isEnrolled:
-                            pass
-                        else:
-                            
-                            # check for existence of scores
-                            scoresExist = Scores.objects.filter(session=activeSession.pk,term=activeTerm.pk,subject=dtframe.SUBJID,studentclass=dtframe.CLASSID,user=dtframe.STDID).exists()
-                    
-                            if scoresExist:
-                                
-                                pass
-                            else:
-                                
-                                    
-                                # ca1 = 0
-                                # ca2 = 0
-                                # ca3 = 0
-                                # exam = 0
-                
-                                # if not math.isnan(dtframe.CA1):
-                                #     ca1 = dtframe.CA1
-                                # elif not math.isnan(dtframe.CA2):
-                                #     ca2 = dtframe.CA2
-                                # elif not math.isnan(dtframe.CA3):
-                                #     ca3 = dtframe.CA3
-                                # elif not math.isnan(dtframe.EXAM):
-                                #     exam = dtframe.EXAM
-                    
-                                obj = Scores.objects.create(
-                                        firstscore=dtframe.CA1,
-                                        secondscore=dtframe.CA2,
-                                        thirdscore=dtframe.CA3,
-                                        totalca=dtframe.CA1 + dtframe.CA2 + dtframe.CA3,
-                                        examscore=dtframe.EXAM,
-                                        subjecttotal=dtframe.EXAM + dtframe.CA1 + dtframe.CA2 + dtframe.CA3,
-                                        session=activeSession,
-                                        term=activeTerm,
-                                        user=studentObj,
-                                        studentclass=classObj,
-                                        subjectteacher= SubjectTeacher.objects.get(teacher=subjteacher.teacher.pk,classroom=dtframe.CLASSID,session=activeSession.pk,subject=dtframe.SUBJID),
-                                        subject=subjectObj,
-                                    )
-                                    
-                                obj.save()
-                    
-                    # process scores -moved this to a different view BuildScores
-                    # processScores(subjectObj,classObj,activeTerm,activeSession)
-                  
+
+                    # Prefetch all needed objects in bulk
+                    student_ids = set(dtframe['STDID'])
+                    class_ids = set(dtframe['CLASSID'])
+                    subject_ids = set(dtframe['SUBJID'])
+
+                    students = {u.id: u for u in User.objects.filter(id__in=student_ids)}
+                    classes = {c.id: c for c in SchoolClass.objects.filter(id__in=class_ids)}
+                    subjects = {s.id: s for s in Subject.objects.filter(id__in=subject_ids)}
+
+                    activeTerm = Term.objects.get(status='True')
+                    activeSession = Session.objects.get(status='True')
+
+                    # Prefetch SubjectTeacher objects for all combinations
+                    subjteacher_map = {
+                        (st.classroom_id, st.session_id, st.subject_id): st
+                        for st in SubjectTeacher.objects.filter(
+                            classroom_id__in=class_ids,
+                            session=activeSession,
+                            subject_id__in=subject_ids
+                        )
+                    }
+
+                    # Prefetch existing scores to avoid duplicates
+                    existing_scores = set(
+                        Scores.objects.filter(
+                            session=activeSession,
+                            term=activeTerm,
+                            subject_id__in=subject_ids,
+                            studentclass_id__in=class_ids,
+                            user_id__in=student_ids
+                        ).values_list('user_id', 'studentclass_id', 'session_id', 'term_id', 'subject_id')
+                    )
+
+                    new_scores = []
+                    for row in dtframe.itertuples():
+                        key = (row.STDID, row.CLASSID, activeSession.id, activeTerm.id, row.SUBJID)
+                        if key in existing_scores:
+                            continue
+
+                        student = students.get(row.STDID)
+                        classObj = classes.get(row.CLASSID)
+                        subjectObj = subjects.get(row.SUBJID)
+                        subjteacher = subjteacher_map.get((row.CLASSID, activeSession.id, row.SUBJID))
+
+                        if not (student and classObj and subjectObj and subjteacher):
+                            continue  # skip if any required object is missing
+
+                        totalca = row.CA1 + row.CA2 + row.CA3
+                        subjecttotal = totalca + row.EXAM
+
+                        new_scores.append(
+                            Scores(
+                                firstscore=row.CA1,
+                                secondscore=row.CA2,
+                                thirdscore=row.CA3,
+                                totalca=totalca,
+                                examscore=row.EXAM,
+                                subjecttotal=subjecttotal,
+                                session=activeSession,
+                                term=activeTerm,
+                                user=student,
+                                studentclass=classObj,
+                                subjectteacher=subjteacher,
+                                subject=subjectObj,
+                            )
+                        )
+
+                    if new_scores:
+                        Scores.objects.bulk_create(new_scores, batch_size=1000)
+
             except Exception as e:
-                
                 raise ValidationError(e)
-           
+
         return Response(
-                {'msg':'Assessment created successfully'},
-                status = status.HTTP_201_CREATED
-                )
+            {'msg': 'Assessment created successfully'},
+            status=status.HTTP_201_CREATED
+        )
         
 
 # List all result based on term, class, session
