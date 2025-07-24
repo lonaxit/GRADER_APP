@@ -1120,10 +1120,13 @@ class GetResult(generics.ListAPIView):
 
 # Detail Result
 class ResultDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
-    queryset = Result.objects.all()
     serializer_class = ResultSerializer
-    # permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
-    
+
+    def get_queryset(self):
+        # Use select_related for all related fields used in the serializer
+        return Result.objects.select_related(
+            'student', 'term', 'session', 'studentclass', 'classteacher__tutor'
+        )
 
 # retrieve all result given a student id
 class UserResultList(generics.ListAPIView):

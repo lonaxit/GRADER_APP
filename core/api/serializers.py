@@ -191,21 +191,17 @@ class ResultSerializer(serializers.ModelSerializer):
     classteacher_name = serializers.CharField(read_only=True)
     user_id = serializers.IntegerField(read_only=True)
     admission_number = serializers.CharField(source='admission_numberstring', read_only=True)
-
-    # Optionally, keep the nested serializers if you want full related objects
-    # student = UserSerializer(read_only=True)
-    # term = TermSerializer(read_only=True)
-    # session = SessionSerializer(read_only=True)
-    # studentclass = SchoolClassSerializer(read_only=True)
-    # classteacher = ClassTeacherSerializer(read_only=True)
+    term_id = serializers.IntegerField(source='term.id', read_only=True)
+    session_id = serializers.IntegerField(source='session.id', read_only=True)
+    class_id = serializers.IntegerField(source='studentclass.id', read_only=True)
 
     class Meta:
         model = Result
         fields = (
             'id', 'student', 'user_id', 'student_full_name',
-            'term', 'term_code',
-            'session', 'session_name',
-            'studentclass', 'class_name',
+            'term', 'term_id', 'term_code',
+            'session', 'session_id', 'session_name',
+            'studentclass', 'class_id', 'class_name',
             'classteacher', 'classteacher_name',
             'admission_number',
             'termtotal', 'termaverage', 'termposition',
