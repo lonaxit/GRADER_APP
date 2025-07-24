@@ -215,6 +215,7 @@ class ResultSerializer(serializers.ModelSerializer):
 
 class TerminalSummaryResultSerializer(serializers.ModelSerializer):
     # Use model property methods for these fields
+    id = serializers.IntegerField(read_only=True)  # <-- Add this line
     student_full_name = serializers.CharField(read_only=True)
     term_code = serializers.CharField(read_only=True)
     session_name = serializers.CharField(read_only=True)
@@ -225,6 +226,7 @@ class TerminalSummaryResultSerializer(serializers.ModelSerializer):
     class Meta:
         model = Result
         fields = (
+            'id',  # <-- Add this field
             'user_id', 'student_full_name', 'term_code', 'session_name', 
             'class_name', 'classteacher_name', 'termtotal', 'termaverage', 'termposition'
         )

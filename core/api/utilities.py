@@ -226,96 +226,90 @@ def processScores(subjectObj,classroomObj,termObj,sessionObj):
 
  
 #    
-def processPsycho(classroom,session,term):
+def processPsycho(classroom, session, term):
+    # Prefetch all psychomotor skills and ratings
+    psycho_skills = list(Psychomotor.objects.all())
+    rating = Rating.objects.get(pk=3)
 
- 
-    # list psycho items
-    # psychoList = Studentpsychomotor.objects.filter(studentclass=classroom.pk,term=term.pk,session=session.pk)
-    psychoList = Studentpsychomotor.objects.filter(
-    studentclass=classroom,
-    term=term,
-    session=session
-    ).select_related('studentclass', 'term', 'session')
-    
-    if not psychoList:
-        # select Distinct students from result table
-        # studentsResultList = Result.objects.filter(studentclass=classroom.pk,session=session.pk,term=term.pk).distinct('student')
-        studentsResultList = Result.objects.filter(
+    # Get all students who should have psychomotor traits
+    studentsResultList = Result.objects.filter(
         studentclass=classroom,
         session=session,
         term=term
-        ).select_related('studentclass', 'session', 'term').distinct('student')
-        # Get class teacher
-  
-        for student in studentsResultList:
-            
-            # check for existence of record
-            if psychoList.filter(student=student.student.pk).exists():
-                pass
-            else:
-                # select three random random skills
-                psycho_skills = Psychomotor.objects.all().order_by("?")[:2]
-                # select rating
-                rating = Rating.objects.get(pk=3)
+    ).select_related('student').distinct('student')
 
-            for i in  psycho_skills:
-                
-                studentPsycho = Studentpsychomotor.objects.create(
-                    session = session,
-                    studentclass = classroom,
-                    term = term,
-                    student = student.student,
-                    psychomotor = Psychomotor.objects.get(pk=i.pk),
-                    rating= rating,
-                                     )
-                studentPsycho.save()
+    # Get all existing Studentpsychomotor records for this class/session/term
+    existing_psycho = set(
+        Studentpsychomotor.objects.filter(
+            studentclass=classroom,
+            term=term,
+            session=session
+        ).values_list('student_id', flat=True)
+    )
+
+    new_psychos = []
+    for student_result in studentsResultList:
+        student_id = student_result.student.pk
+        if student_id in existing_psycho:
+            continue
+        # Select two random psychomotor skills for each student
+        selected_skills = random.sample(psycho_skills, min(2, len(psycho_skills)))
+        for skill in selected_skills:
+            new_psychos.append(
+                Studentpsychomotor(
+                    session=session,
+                    studentclass=classroom,
+                    term=term,
+                    student=student_result.student,
+                    psychomotor=skill,
+                    rating=rating,
+                )
+            )
+    if new_psychos:
+        Studentpsychomotor.objects.bulk_create(new_psychos, batch_size=1000)
 
 # 
-def processAffective(classroom,session,term):
-    
-    # list affetive items
-    # affective = Studentaffective.objects.filter(studentclass=classroom.pk,term=term.pk,session=session.pk)
-    affective = Studentaffective.objects.filter(
-    studentclass=classroom,
-    term=term,
-    session=session
-    ).select_related('studentclass', 'term', 'session')
-    
-    if not affective:
-        
-        # select Distinct students from result table
-        # studentsResultList = Result.objects.filter(studentclass=classroom,session=session,term=term).distinct('student')
-        
-        studentsResultList = Result.objects.filter(
+def processAffective(classroom, session, term):
+    # Prefetch all affective skills and ratings
+    affective_skills = list(Affective.objects.all())
+    rating = Rating.objects.get(pk=3)
+
+    # Get all students who should have affective traits
+    studentsResultList = Result.objects.filter(
         studentclass=classroom,
         session=session,
         term=term
-        ).select_related('student', 'studentclass', 'session', 'term').distinct('student')
+    ).select_related('student').distinct('student')
 
-    
-        for student in studentsResultList:
-        
-            # check for existence of record
-            if affective.filter(student=student.student.pk).exists():
-                pass
-            else:
-                # select three random affective skills
-                affective_skills = Affective.objects.all().order_by("?")[:2]
-                # select rating
-                rating = Rating.objects.get(pk=3)
+    # Get all existing Studentaffective records for this class/session/term
+    existing_affective = set(
+        Studentaffective.objects.filter(
+            studentclass=classroom,
+            term=term,
+            session=session
+        ).values_list('student_id', flat=True)
+    )
 
-            for i in affective_skills:
-
-                # create a new record
-                studentAffective = Studentaffective.objects.create(
-                        session = session,
-                        studentclass = classroom,
-                        term = term,
-                        student = student.student,
-                        affective = Affective.objects.get(pk=i.pk),
-                        rating= rating,
-                        )
-                studentAffective.save()
+    new_affectives = []
+    for student_result in studentsResultList:
+        student_id = student_result.student.pk
+        if student_id in existing_affective:
+            continue
+        # Select two random affective skills for each student
+        selected_skills = random.sample(affective_skills, min(2, len(affective_skills)))
+        for skill in selected_skills:
+            new_affectives.append(
+                Studentaffective(
+                    session=session,
+                    studentclass=classroom,
+                    term=term,
+                    student=student_result.student,
+                    affective=skill,
+                    rating=rating,
+                )
+            )
+    if new_affectives:
+        Studentaffective.objects.bulk_create(new_affectives, batch_size=1000)
 
     
 
@@ -359,47 +353,39 @@ def terminalPosition(classroom, term, session):
         )
 
 
-def autoAddComment(classroom,session,term):
-
+def autoAddComment(classroom, session, term):
     # select result
-    resultFilter = Result.objects.select_for_update().filter(studentclass=classroom.pk,session=session.pk,term=term.pk)
+    resultFilter = Result.objects.select_for_update().filter(
+        studentclass=classroom.pk,
+        session=session.pk,
+        term=term.pk
+    )
 
+    results_to_update = []
     for resultObj in resultFilter:
-
-        if resultObj.termaverage <= 39.99:
-            resultObj.classteachercomment = 'Failed'
-            resultObj.headteachercomment = 'Failed'
-            resultObj.save()
-            
-        elif resultObj.termaverage >= 40 and resultObj.termaverage <= 44.99:
-            resultObj.classteachercomment = 'A Fair Result'
-            resultObj.headteachercomment = 'A Fair Result'
-            resultObj.save()
-            
-        elif resultObj.termaverage >= 45 and resultObj.termaverage <= 54.99:
-            resultObj.classteachercomment = 'A Passed Result'
-            resultObj.headteachercomment = 'A Passed Result'
-            resultObj.save()
-            
-        elif resultObj.termaverage >= 55 and resultObj.termaverage <= 64.99:
-            resultObj.classteachercomment = 'A Good Result'
-            resultObj.headteachercomment = 'A Good Result'
-            resultObj.save()
-            
-        elif resultObj.termaverage >= 65 and resultObj.termaverage <= 74.99:
-            resultObj.classteachercomment = 'A Very Good Result'
-            resultObj.headteachercomment = 'A Very Good Result'
-            resultObj.save()
-            
-        elif resultObj.termaverage >= 75 and resultObj.termaverage <= 100:
-            resultObj.classteachercomment = 'An Excellent Result '
-            resultObj.headteachercomment = 'An Excellent Result'
-            resultObj.save()
-            
+        if resultObj.termaverage is None:
+            comment = 'NA'
+        elif resultObj.termaverage <= 39.99:
+            comment = 'Failed'
+        elif 40 <= resultObj.termaverage <= 44.99:
+            comment = 'A Fair Result'
+        elif 45 <= resultObj.termaverage <= 54.99:
+            comment = 'A Passed Result'
+        elif 55 <= resultObj.termaverage <= 64.99:
+            comment = 'A Good Result'
+        elif 65 <= resultObj.termaverage <= 74.99:
+            comment = 'A Very Good Result'
+        elif 75 <= resultObj.termaverage <= 100:
+            comment = 'An Excellent Result'
         else:
-            resultObj.classteachercomment = 'NA'
-            resultObj.headteachercomment = 'NA'
-            resultObj.save()
+            comment = 'NA'
+
+        resultObj.classteachercomment = comment
+        resultObj.headteachercomment = comment
+        results_to_update.append(resultObj)
+
+    if results_to_update:
+        Result.objects.bulk_update(results_to_update, ['classteachercomment', 'headteachercomment'])
 
 # Annual Average
 def annualAverage(studentid,classroom,session):
