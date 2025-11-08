@@ -280,9 +280,24 @@ class UpdatePasswordUsername(APIView):
         
         except User.DoesNotExist:
             raise ValidationErr('Username does not exist')
-        
-        
-      
-        
-    
+
+
+# New: retrieve students that are marked is_student=True but have no StudentProfile
+class UnlinkedStudents(APIView):
+    """
+    GET: return all users with is_student=True and no associated StudentProfile,
+    ordered DESC by date_joined.
+    """
+    def get(self, request):
+        try:
+            users = User.objects.filter(is_student=True, studentprofile__isnull=True).order_by('-date_joined')
+            serializer = UserSerializer(users, many=True)
+            return Response({'users': serializer.data}, status=status.HTTP_200_OK)
+        except Exception as e:
+            return Response({'error': str(e)}, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
+
+
+
+
+
 

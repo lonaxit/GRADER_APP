@@ -15,4 +15,5 @@ urlpatterns=[
     
     # Change password using username
     path('username-update-password/',UpdatePasswordUsername.as_view(), name="username-update-password"),     
+    path('unlinked-students/', UnlinkedStudents.as_view(), name='unlinked-students'),
 ]
