@@ -134,18 +134,22 @@ def scoresRating(subject, classroom, termObj, sessionObj):
     updates = []
     for score in scores:
         total = score.subjecttotal or 0
-        if total <= 39:
-            grade, rating = 'F', 'Failed'
-        elif 40 <= total <= 44.9:
-            grade, rating = 'E', 'Poor'
-        elif 45 <= total <= 54.9:
-            grade, rating = 'D', 'Fair'
-        elif 55 <= total <= 64.9:
-            grade, rating = 'C', 'Good'
-        elif 65 <= total <= 74.9:
-            grade, rating = 'B', 'Very Good'
-        elif 75 <= total <= 100:
+        # New grade bands:
+        # 75 and above = 'A' Excellent
+        # 65 - 74.9 = 'B' Very Good
+        # 55 - 64.9 = 'C' Good
+        # 50 - 54.9 = 'D' Pass
+        # 0 - 49.9 = 'E' Failed
+        if total >= 75:
             grade, rating = 'A', 'Excellent'
+        elif 65 <= total < 75:
+            grade, rating = 'B', 'Very Good'
+        elif 55 <= total < 65:
+            grade, rating = 'C', 'Good'
+        elif 50 <= total < 55:
+            grade, rating = 'D', 'Pass'
+        elif 0 <= total < 50:
+            grade, rating = 'E', 'Failed'
         else:
             grade, rating = 'NA', 'NA'
         score.subjectgrade = grade
@@ -329,15 +333,14 @@ def autoAddComment(classroom, session, term):
     for resultObj in resultFilter:
         if resultObj.termaverage is None:
             comment = 'NA'
-        elif resultObj.termaverage <= 39.99:
+        # Align comments with new grade bands
+        elif resultObj.termaverage < 50:
             comment = 'Failed'
-        elif 40 <= resultObj.termaverage <= 44.99:
-            comment = 'A Fair Result'
-        elif 45 <= resultObj.termaverage <= 54.99:
-            comment = 'A Passed Result'
-        elif 55 <= resultObj.termaverage <= 64.99:
+        elif 50 <= resultObj.termaverage < 55:
+            comment = 'A Pass Result'
+        elif 55 <= resultObj.termaverage < 65:
             comment = 'A Good Result'
-        elif 65 <= resultObj.termaverage <= 74.99:
+        elif 65 <= resultObj.termaverage < 75:
             comment = 'A Very Good Result'
         elif 75 <= resultObj.termaverage <= 100:
             comment = 'An Excellent Result'
