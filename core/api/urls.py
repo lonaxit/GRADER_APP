@@ -24,6 +24,9 @@ urlpatterns =[
     
     path("resumption-setting/", ResumptionSettingsCreateAPIView.as_view(), name="resumption-setting"),
     
+    # Get active resumption setting (active session and term)
+    path("active-resumption-setting/", GetActiveResumptionSetting.as_view(), name="active-resumption-setting"),
+    
     # not working refactor
     # path("get-resumption-date/", GetResumptionDate.as_view(), name="get-resumption-date"),
     

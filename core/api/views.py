@@ -153,6 +153,53 @@ class ResumptionSettingsClassDetailAPIView(generics.RetrieveUpdateDestroyAPIView
     serializer_class = ResumptionSettingSerializer
     # permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
     
+
+# Get active resumption setting (where both session and term status are True)
+class GetActiveResumptionSetting(APIView):
+    """
+    Fetch the ResumptionSetting for the active session and term
+    (where both Session.status=True and Term.status=True)
+    """
+    # permission_classes = [IsAuthenticated]
+    
+    def get(self, request):
+        try:
+            # Get active session (status=True)
+            active_session = Session.objects.filter(status=True).first()
+            if not active_session:
+                return Response(
+                    {'error': 'No active session found'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Get active term (status=True)
+            active_term = Term.objects.filter(status=True).first()
+            if not active_term:
+                return Response(
+                    {'error': 'No active term found'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            # Get resumption setting for active session and term
+            resumption_setting = ResumptionSetting.objects.filter(
+                session=active_session,
+                current_term=active_term
+            ).first()
+            
+            if not resumption_setting:
+                return Response(
+                    {'error': 'No resumption setting found for active session and term'},
+                    status=status.HTTP_404_NOT_FOUND
+                )
+            
+            serializer = ResumptionSettingSerializer(resumption_setting)
+            return Response(serializer.data, status=status.HTTP_200_OK)
+            
+        except Exception as e:
+            return Response(
+                {'error': str(e)},
+                status=status.HTTP_500_INTERNAL_SERVER_ERROR
+            )
     
 
 class StudentProfileListAPIView(generics.ListAPIView):
