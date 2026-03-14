@@ -5,6 +5,7 @@ from core.api.views import *
 urlpatterns =[
     path("term/", TermListCreateAPIView.as_view(), name="term"),
     path("term-detail/<int:pk>/", TermDetailAPIView.as_view(), name="term-detail"),
+    path("toggle-term/<int:pk>/", ToggleTermAPIView.as_view(), name="toggle-term"),
     
     path("session/", SessionListCreateAPIView.as_view(), name="session"),
     path("session-detail/<int:pk>/", SessionDetailAPIView.as_view(), name="session-detail"),

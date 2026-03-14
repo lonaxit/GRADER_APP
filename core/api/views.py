@@ -57,7 +57,24 @@ class TermDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     queryset =Term.objects.all()
     serializer_class = TermSerializer
     # permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
-    
+
+
+class ToggleTermAPIView(generics.RetrieveUpdateAPIView):
+    queryset = Term.objects.all()
+    serializer_class = TermSerializer
+
+    def get(self, request, *args, **kwargs):
+        instance = self.get_object()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
+    def put(self, request, *args, **kwargs):
+        instance = self.get_object()
+        instance.status = not instance.status  # Toggle the status
+        instance.save()
+        serializer = self.get_serializer(instance)
+        return Response(serializer.data)
+
 
 class SessionListCreateAPIView(generics.ListCreateAPIView):
     # ListCreateAPIView gives us both the get and post methods
