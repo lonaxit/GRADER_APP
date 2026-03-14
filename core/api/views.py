@@ -58,7 +58,7 @@ class TermDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     serializer_class = TermSerializer
     # permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
 
-
+# function to toggle status of term
 class ToggleTermAPIView(APIView):
 
     def get(self, request, pk, *args, **kwargs):
