@@ -59,20 +59,23 @@ class TermDetailAPIView(generics.RetrieveUpdateDestroyAPIView):
     # permission_classes =[IsAuthenticated & IsAuthOrReadOnly]
 
 
-class ToggleTermAPIView(generics.RetrieveUpdateAPIView):
-    queryset = Term.objects.all()
-    serializer_class = TermSerializer
+class ToggleTermAPIView(APIView):
 
-    def get(self, request, *args, **kwargs):
-        instance = self.get_object()
-        serializer = self.get_serializer(instance)
+    def get(self, request, pk, *args, **kwargs):
+        instance = get_object_or_404(Term, pk=pk)
+        serializer = TermSerializer(instance)
         return Response(serializer.data)
 
-    def put(self, request, *args, **kwargs):
-        instance = self.get_object()
-        instance.status = not instance.status  # Toggle the status
-        instance.save()
-        serializer = self.get_serializer(instance)
+    def put(self, request, pk, *args, **kwargs):
+        instance = get_object_or_404(Term, pk=pk)
+        new_status = not instance.status
+        with transaction.atomic():
+            if new_status:
+                # Ensure only one term is active at a time
+                Term.objects.exclude(pk=pk).update(status=False)
+            instance.status = new_status
+            instance.save(update_fields=['status', 'date_modified'])
+        serializer = TermSerializer(instance)
         return Response(serializer.data)
 
 
