@@ -70,7 +70,11 @@ class ToggleTermAPIView(generics.RetrieveUpdateAPIView):
 
     def put(self, request, *args, **kwargs):
         instance = self.get_object()
-        instance.status = not instance.status  # Toggle the status
+        new_status = not instance.status
+        if new_status:
+            # Deactivate all other terms before activating this one
+            Term.objects.exclude(pk=instance.pk).update(status=False)
+        instance.status = new_status
         instance.save()
         serializer = self.get_serializer(instance)
         return Response(serializer.data)
